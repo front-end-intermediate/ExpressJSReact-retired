@@ -4,9 +4,11 @@ Create a React project:
 
 `npx create-react-app client`
 
+We could run the client by cd'ing into it but then we would have to run the server in a separate tab.
+
 Install npm concurrently as dev dependency
 
-`npm i -D concurrently `
+`npm i -D concurrently`
 
 Edit the package.json scripts:
 
@@ -15,12 +17,49 @@ Edit the package.json scripts:
 "dev": "concurrently \"npm run server\" \"npm run client\""
 ```
 
-Note: any React specific npm install should be done in the client folder.
+Change the PORT in `.env` to 5000.
 
-Proxy in client?
+cd into the root and run `npm run dev`.
 
-`"proxy": "http://localhost:3000"`
+Note: any React specific npm installs need to be done in the client folder.
 
+Proxy in client package.json:
+
+`"proxy": "http://localhost:5000"`
+
+Clean up files in client.
+
+index.js:
+
+```js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+
+class App extends React.Component {
+  state = {
+    recipes: []
+  };
+
+  componentDidMount() {
+    fetch(`http://localhost:5001/api/recipes`)
+      .then(response => response.json())
+      .then(data => console.log(data));
+  }
+
+  render() {
+    return (
+      <div>
+        <p>Hello</p>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+CORs. In `server.js`:
 
 ```js
 app.use((req, res, next) => {
@@ -34,7 +73,7 @@ app.use((req, res, next) => {
 });
 ```
 
-index.js
+index.js:
 
 ```js
 import React from 'react';
@@ -74,4 +113,42 @@ class Recipe extends React.Component {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+Create a components folder in src and break the App and Recipe components into separate files.
+
+Scaffold the Recipes component.
+
+```js
+import React from 'react';
+
+class Recipe extends React.Component {
+  render() {
+    const {
+      title,
+      description,
+      image,
+      ingredients,
+      preparation
+    } = this.props.recipe;
+    return (
+      <>
+        <img
+          src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${image}`}
+          alt={this.props.recipe.name}
+        />
+        <h3>{title}</h3>
+        <p>{description}</p>
+        <h4>Ingredients</h4>
+        <ul>
+          {ingredients.map(ingredient => (
+            <li>{ingredient}</li>
+          ))}
+        </ul>
+      </>
+    );
+  }
+}
+
+export default Recipe;
 ```
