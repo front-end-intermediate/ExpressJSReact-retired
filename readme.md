@@ -1,10 +1,14 @@
 # Express and React
 
+Create a React project:
+
 `npx create-react-app client`
 
 Install npm concurrently as dev dependency
 
 `npm i -D concurrently `
+
+Edit the package.json scripts:
 
 ```sh
 "client": "npm start --prefix client",
