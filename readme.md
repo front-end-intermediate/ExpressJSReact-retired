@@ -1,5 +1,13 @@
 # Express and React
 
+- [Express and React](#express-and-react)
+- [Create React App](#create-react-app)
+  - [First Component](#first-component)
+  - [Using CORS](#using-cors)
+  - [Recipes](#recipes)
+
+# Create React App
+
 Create a React project:
 
 `npx create-react-app client`
@@ -28,6 +36,8 @@ Proxy in client package.json:
 `"proxy": "http://localhost:5000"`
 
 Clean up files in client.
+
+## First Component
 
 index.js:
 
@@ -59,7 +69,9 @@ class App extends React.Component {
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-CORs. In `server.js`:
+## Using CORS
+
+CORS. In `server.js`:
 
 ```js
 app.use((req, res, next) => {
@@ -116,6 +128,8 @@ ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
 Create a components folder in src and break the App and Recipe components into separate files.
+
+## Recipes
 
 Scaffold the Recipes component.
 
