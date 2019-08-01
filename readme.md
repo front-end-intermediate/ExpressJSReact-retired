@@ -407,3 +407,134 @@ class RecipeDetail extends React.Component {
 export default RecipeDetail;
 
 ```
+
+```js
+return (
+  <div>
+    <pre>{JSON.stringify(this.state.recipe, null, 2)}</pre>
+  </div>
+)
+```
+
+To illustrate some issues with the buildout of RecipeDetail:
+
+```js
+import React from 'react';
+
+class RecipeDetail extends React.Component {
+  state = {
+    recipe: {},
+    loading: false
+    // ingredients: ['4', '5'],
+  };
+
+  componentDidMount() {
+    this.setState({ loading: true });
+    fetch(`http://localhost:5000/api/recipes/${this.props.recipeId}`)
+      .then(response => response.json())
+      .then(recipe =>
+        this.setState({
+          recipe: recipe,
+          loading: false
+          // ingredients: recipe.ingredients
+        })
+      );
+    // this.state.loading = false;
+  }
+
+  render() {
+    if (this.state.loading) return 'Loading...';
+
+    const {
+      title,
+      description,
+      image,
+      ingredients,
+      preparation
+    } = this.state.recipe;
+
+    return (
+      <div>
+        <pre>{JSON.stringify(this.state.recipe, null, 2)}</pre>
+        <img
+          src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${image}`}
+          alt={title}
+        />
+        <h3>{title}</h3>
+        <p>{description}</p>
+        <h4>Ingredients</h4>
+        {ingredients && ingredients.map(item => <p key={item}>{item}</p>)}
+        <h4>Preparation</h4>
+        {preparation &&
+          preparation.map(prep => <p key={prep.step}>{prep.step}</p>)}
+      </div>
+    );
+  }
+}
+
+export default RecipeDetail;
+
+```
+
+One solution:
+
+```js
+import React from 'react';
+
+class RecipeDetail extends React.Component {
+  state = {
+    recipe: {},
+    loading: false,
+    ingredients: [],
+    preparation: []
+  };
+
+  componentDidMount() {
+    this.setState({ loading: true });
+    fetch(`http://localhost:5000/api/recipes/${this.props.recipeId}`)
+      .then(response => response.json())
+      .then(recipe =>
+        this.setState({
+          recipe,
+          loading: false,
+          ingredients: recipe.ingredients,
+          preparation: recipe.preparation
+        })
+      );
+  }
+
+  render() {
+    if (this.state.loading) return 'Loading...';
+
+    const { title, description, image } = this.state.recipe;
+
+    const { ingredients, preparation } = this.state;
+
+    return (
+      <div>
+        <img
+          src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${image}`}
+          alt={title}
+        />
+        <h3>{title}</h3>
+        <p>{description}</p>
+        <h4>Ingredients</h4>
+        <ul>
+          {ingredients.map(item => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <h4>Preparation</h4>
+        <ul>
+          {preparation.map(prep => (
+            <li key={prep.step}>{prep.step}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+}
+
+export default RecipeDetail;
+
+```
