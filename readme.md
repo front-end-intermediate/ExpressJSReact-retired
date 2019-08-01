@@ -1,9 +1,21 @@
 # Express and React
 - [Express and React](#express-and-react)
-  - [Create a React project](#create-a-react-project)
+  - [Homework](#homework)
+  - [Create a React project:](#create-a-react-project)
+  - [The First Component](#the-first-component)
+  - [Component Lifecycle](#component-lifecycle)
+  - [CORS](#cors)
+  - [Multiple Components](#multiple-components)
+  - [Single Page Routing](#single-page-routing)
+  - [Recipe Details](#recipe-details)
 
+## Homework
 
-## Create a React project
+You should continue to build out the details component. 
+
+This project is a template for your final project which **must** include an Express API as well as a font end wirtten in React. 
+
+## Create a React project:
 
 `npx create-react-app client`
 
@@ -31,6 +43,8 @@ Proxy in client package.json:
 `"proxy": "http://localhost:5000"`
 
 Clean up files in client.
+
+## The First Component
 
 index.js:
 
@@ -62,19 +76,7 @@ class App extends React.Component {
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-CORs. In `server.js`:
-
-```js
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  next();
-});
-```
+## Component Lifecycle
 
 index.js:
 
@@ -117,6 +119,24 @@ class Recipe extends React.Component {
 
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
+
+## CORS
+
+CORs. In `server.js`:
+
+```js
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  next();
+});
+```
+
+## Multiple Components
 
 Create a components folder in src and break the App and Recipe components into separate files.
 
@@ -166,7 +186,7 @@ export default Recipe;
 Copy the CSS from the vanillajs public folder into index.css.
 
 
-Routing
+## Single Page Routing
 
 Import reach router and import the router into App:
 
@@ -334,6 +354,8 @@ export default Recipe;
 
 ```
 
+## Recipe Details
+
 Build out the RecipeDetail component:
 
 ```js
@@ -376,6 +398,7 @@ class RecipeDetail extends React.Component {
         </h3>
         <p>{description}</p>
         <h4>Ingredients</h4>
+        {ingredients}
       </div>
     );
   }
