@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" href="css/styles.css" />
-    <title>Recipes!</title>
+    <title>Recipe Detail</title>
   </head>
   <body>
     <div id="root">
-      <br style="clear: both" />
+      <h1>Recipes!</h1>
       <h3>Edit Recipe</h3>
-      <form style="clear:both;">
+
+      <form>
         <input type="text" placeholder="Recipe Title" name="title" />
         <input type="text" placeholder="Image" name="image" />
         <textarea
@@ -21,11 +22,15 @@
         ></textarea>
         <button onclick="updateRecipe()">Update</button>
       </form>
-      <!-- <button onclick="() => ">Back</button> -->
-      <a href="/">Back</a> || <a href="/api/import">Import</a>
+
+      <form action="/api/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" />
+        <input type="text" placeholder="File name" name="filename" />
+        <button type="submit">Submit</button>
+      </form>
     </div>
 
-    <script src="js/scripts.js"></script>
+    <script src="./js/scripts.js"></script>
     <script>
       detail();
     </script>
