@@ -1,4 +1,5 @@
 # Express and React
+
 - [Express and React](#express-and-react)
   - [Homework](#homework)
   - [Create a React project:](#create-a-react-project)
@@ -8,12 +9,15 @@
   - [Multiple Components](#multiple-components)
   - [Single Page Routing](#single-page-routing)
   - [Recipe Details](#recipe-details)
+  - [ADDING](#adding)
+  - [react-icons](#react-icons)
+  - [Editing a Recipe](#editing-a-recipe)
 
 ## Homework
 
-You should continue to build out the details component. 
+You should continue to build out the details component.
 
-This project is a template for your final project which **must** include an Express API as well as a font end wirtten in React. 
+This project is a template for your final project which **must** include an Express API as well as a font end written in React.
 
 ## Create a React project:
 
@@ -180,11 +184,9 @@ class Recipe extends React.Component {
 }
 
 export default Recipe;
-
 ```
 
 Copy the CSS from the vanillajs public folder into index.css.
-
 
 ## Single Page Routing
 
@@ -248,7 +250,6 @@ class Recipes extends React.Component {
 }
 
 export default Recipes;
-
 ```
 
 Edit the Recipe component:
@@ -295,7 +296,6 @@ class Recipe extends React.Component {
 }
 
 export default Recipe;
-
 ```
 
 The Recipe items will link to a new RecipeDetail component:
@@ -316,7 +316,6 @@ class RecipeDetail extends React.Component {
 }
 
 export default RecipeDetail;
-
 ```
 
 Edit the Recipe component to remove the details:
@@ -351,7 +350,6 @@ class Recipe extends React.Component {
 }
 
 export default Recipe;
-
 ```
 
 ## Recipe Details
@@ -405,7 +403,6 @@ class RecipeDetail extends React.Component {
 }
 
 export default RecipeDetail;
-
 ```
 
 ```js
@@ -413,7 +410,7 @@ return (
   <div>
     <pre>{JSON.stringify(this.state.recipe, null, 2)}</pre>
   </div>
-)
+);
 ```
 
 To illustrate some issues with the buildout of RecipeDetail:
@@ -473,7 +470,6 @@ class RecipeDetail extends React.Component {
 }
 
 export default RecipeDetail;
-
 ```
 
 One solution:
@@ -536,5 +532,657 @@ class RecipeDetail extends React.Component {
 }
 
 export default RecipeDetail;
+```
 
+## ADDING
+
+```js
+import React, { Component } from 'react';
+
+class RecipeMaintainance extends Component {
+  render() {
+    return (
+      <div>
+        <h3>Add Recipe Form</h3>
+        <form>
+          <input type='text' placeholder='Recipe name' />
+          <input type='text' placeholder='Recipe image' />
+          <textarea type='text' placeholder='Recipe description' />
+          <button type='submit'>Add Recipe</button>
+        </form>
+      </div>
+    );
+  }
+}
+
+export default RecipeMaintainance;
+```
+
+```js
+import React, { Component } from 'react';
+
+class RecipeMaintainance extends Component {
+  createRecipe(e) {
+    e.preventDefault();
+    console.log('making a recipe');
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>Add Recipe Form</h3>
+        <form onSubmit={e => this.createRecipe(e)}>
+          <input type='text' placeholder='Recipe name' />
+          <input type='text' placeholder='Recipe image' />
+          <textarea type='text' placeholder='Recipe description' />
+          <button type='submit'>Add Recipe</button>
+        </form>
+      </div>
+    );
+  }
+}
+
+export default RecipeMaintainance;
+```
+
+```js
+import React, { Component } from 'react';
+
+class RecipeMaintainance extends Component {
+  nameRef = React.createRef();
+  imageRef = React.createRef();
+  descriptionRef = React.createRef();
+
+  createRecipe(e) {
+    e.preventDefault();
+    console.log('making a recipe');
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>Add Recipe Form</h3>
+        <form onSubmit={e => this.createRecipe(e)}>
+          <input
+            type='text'
+            name='name'
+            placeholder='Recipe name'
+            ref={this.nameRef}
+          />
+          <input
+            type='text'
+            name='image'
+            placeholder='Recipe image'
+            ref={this.imageRef}
+          />
+          <textarea
+            type='text'
+            name='description'
+            placeholder='Recipe description'
+            ref={this.descriptionRef}
+          />
+          <button type='submit'>Add Recipe</button>
+        </form>
+      </div>
+    );
+  }
+}
+
+export default RecipeMaintainance;
+```
+
+```
+import React, { Component } from 'react';
+
+class RecipeMaintainance extends Component {
+  nameRef = React.createRef();
+  imageRef = React.createRef();
+  descriptionRef = React.createRef();
+
+  createRecipe(e) {
+    e.preventDefault();
+    const recipe = {
+      name: this.nameRef.current.value,
+      image: this.imageRef.current.value,
+      description: this.descriptionRef.current.value,
+    };
+    this.props.addRecipe(recipe);
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>Add Recipe Form</h3>
+        <form onSubmit={e => this.createRecipe(e)}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Recipe name"
+            ref={this.nameRef}
+          />
+          <input
+            type="text"
+            name="image"
+            placeholder="Recipe image"
+            ref={this.imageRef}
+          />
+          <textarea
+            type="text"
+            name="description"
+            placeholder="Recipe description"
+            ref={this.descriptionRef}
+          />
+          <button type="submit">Add Recipe</button>
+        </form>
+      </div>
+    );
+  }
+}
+
+export default RecipeMaintainance;
+
+```
+
+```
+import React from 'react';
+import Recipes from './Recipes';
+import RecipeDetails from './RecipeDetails';
+import RecipeMaintainance from './RecipeMaintainance';
+
+import { Router } from '@reach/router';
+
+class App extends React.Component {
+  state = {
+    recipes: [],
+  };
+
+  componentDidMount() {
+    fetch(`http://localhost:5000/api/recipes`)
+      .then(response => response.json())
+      .then(recipes =>
+        this.setState({
+          recipes: recipes,
+        }),
+      );
+  }
+
+  addRecipe = recipe => {
+    console.log(recipe);
+  };
+
+  render() {
+    return (
+      <div>
+        <Router>
+          <Recipes path="/" recipes={this.state.recipes} />
+          <RecipeDetails path="/recipe/:recipeId" />
+          <RecipeMaintainance path="/maintainance" addRecipe={this.addRecipe} />
+        </Router>
+      </div>
+    );
+  }
+}
+
+export default App;
+
+```
+
+```
+import React from 'react';
+import Recipes from './Recipes';
+import RecipeDetails from './RecipeDetails';
+import RecipeMaintainance from './RecipeMaintainance';
+
+import { Router } from '@reach/router';
+
+class App extends React.Component {
+  state = {
+    recipes: [],
+  };
+
+  componentDidMount() {
+    fetch(`http://localhost:5000/api/recipes`)
+      .then(response => response.json())
+      .then(recipes =>
+        this.setState({
+          recipes: recipes,
+        }),
+      );
+  }
+
+  addRecipe = recipe => {
+    const recipes = [...this.state.recipes];
+    console.log(recipes);
+  };
+
+  render() {
+    return (
+      <div>
+        <Router>
+          <Recipes path="/" recipes={this.state.recipes} />
+          <RecipeDetails path="/recipe/:recipeId" />
+          <RecipeMaintainance path="/maintainance" addRecipe={this.addRecipe} />
+        </Router>
+      </div>
+    );
+  }
+}
+
+export default App;
+
+```
+
+```
+  addRecipe = recipe => {
+    console.log(recipe);
+    // const recipes = [...this.state.recipes];
+    // recipes.unshift(recipe);
+    fetch(`http://localhost:5000/api/recipes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(recipe),
+    })
+      .then(response => response.json())
+      .then(recipe => console.log(recipe));
+    // this.setState({ recipes: recipes });
+  };
+```
+
+```js
+import React, { Component } from 'react';
+
+class RecipeMaintainance extends Component {
+  titleRef = React.createRef();
+  imageRef = React.createRef();
+  descriptionRef = React.createRef();
+
+  createRecipe(e) {
+    e.preventDefault();
+    const recipe = {
+      title: this.titleRef.current.value,
+      image: this.imageRef.current.value,
+      description: this.descriptionRef.current.value
+    };
+    this.props.addRecipe(recipe);
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>Add Recipe Form</h3>
+        <form onSubmit={e => this.createRecipe(e)}>
+          <input
+            type='text'
+            name='title'
+            placeholder='Recipe name'
+            ref={this.titleRef}
+          />
+          <input
+            type='text'
+            name='image'
+            placeholder='Recipe image'
+            ref={this.imageRef}
+          />
+          <textarea
+            type='text'
+            name='description'
+            placeholder='Recipe description'
+            ref={this.descriptionRef}
+          />
+          <button type='submit'>Add Recipe</button>
+        </form>
+      </div>
+    );
+  }
+}
+
+export default RecipeMaintainance;
+```
+
+Home Link.
+
+App.js:
+
+```js
+render() {
+  return (
+    <>
+      <nav>
+        <Link to='/'>Home</Link>
+      </nav>
+      <Router>
+        <Recipes path='/' recipes={this.state.recipes} />
+        <RecipeDetails path='/recipe/:recipeId' />
+        <RecipeMaintainance path='/maintainance' addRecipe={this.addRecipe} />
+      </Router>
+    </>
+  );
+```
+
+Import Link.
+
+css:
+
+```css
+nav {
+  min-height: 3rem;
+  background-color: #007eb6;
+  margin-bottom: 1rem;
+  display: flex;
+  align-content: center;
+}
+nav a {
+  color: #fff;
+  padding: 1rem;
+}
+```
+
+Adding delete to RecipeMaintainance:
+
+```js
+import React, { Component } from 'react';
+
+class ListRecipes extends Component {
+  handleDelete(id) {
+    fetch(`http://localhost:5000/api/recipes/${id}`, {
+      method: 'DELETE'
+    }).then(response => console.log(response));
+  }
+
+  render() {
+    return (
+      <ul>
+        {this.props.recipes.map(recipe => (
+          <li>
+            {recipe.title}{' '}
+            <button onClick={() => this.handleDelete(recipe._id)}>X</button>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+}
+
+class RecipeMaintainance extends Component {
+  titleRef = React.createRef();
+  imageRef = React.createRef();
+  descriptionRef = React.createRef();
+
+  createRecipe(e) {
+    e.preventDefault();
+    const recipe = {
+      title: this.titleRef.current.value,
+      image: this.imageRef.current.value,
+      description: this.descriptionRef.current.value
+    };
+    this.props.addRecipe(recipe);
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>Add Recipe Form</h3>
+        <form onSubmit={e => this.createRecipe(e)}>
+          <input
+            type='text'
+            name='title'
+            placeholder='Recipe name'
+            ref={this.titleRef}
+          />
+          <input
+            type='text'
+            name='image'
+            placeholder='Recipe image'
+            ref={this.imageRef}
+          />
+          <textarea
+            type='text'
+            name='description'
+            placeholder='Recipe description'
+            ref={this.descriptionRef}
+          />
+          <button type='submit'>Add Recipe</button>
+        </form>
+        <ListRecipes recipes={this.props.recipes} />
+      </div>
+    );
+  }
+}
+
+export default RecipeMaintainance;
+```
+
+Lifting state up and the 'this' keyowrd:
+
+```js
+import React from 'react';
+import Recipes from './Recipes';
+import RecipeDetails from './RecipeDetails';
+import NavBar from './NavBar';
+import RecipeMaintainance from './RecipeMaintainance';
+
+import { Router, Link } from '@reach/router';
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      recipes: []
+    };
+    this.handleDelete = this.handleDelete.bind(this);
+  }
+
+  componentDidMount() {
+    fetch(`http://localhost:5000/api/recipes`)
+      .then(response => response.json())
+      .then(recipes =>
+        this.setState({
+          recipes: recipes
+        })
+      );
+  }
+
+  addRecipe = recipe => {
+    console.log(recipe);
+    // const recipes = [...this.state.recipes];
+    // recipes.unshift(recipe);
+    fetch(`http://localhost:5000/api/recipes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(recipe)
+    })
+      .then(response => response.json())
+      .then(recipe => console.log(recipe));
+    // this.setState({ recipes: recipes });
+  };
+
+  handleDelete(id) {
+    console.log(this.state);
+    console.log(id);
+
+    fetch(`http://localhost:5000/api/recipes/${id}`, {
+      method: 'DELETE'
+    });
+    const recipes = [...this.state.recipes];
+    recipes.splice(id, 1);
+    this.setState({ recipes: recipes });
+  }
+
+  render() {
+    return (
+      <>
+        <nav>
+          <Link to='/'>Home</Link> <Link to='/maintainance'>Maintainance</Link>
+        </nav>
+        <Router>
+          <Recipes path='/' recipes={this.state.recipes} />
+          <RecipeDetails path='/recipe/:recipeId' />
+          <RecipeMaintainance
+            path='/maintainance'
+            addRecipe={this.addRecipe}
+            recipes={this.state.recipes}
+            handleDelete={this.handleDelete}
+          />
+        </Router>
+      </>
+    );
+  }
+}
+
+export default App;
+```
+
+## react-icons
+
+npm install react-icons and use them in the maintainance interface
+
+```js
+import React, { Component } from 'react';
+import { FaTimesCircle } from 'react-icons/fa';
+
+class ListRecipes extends Component {
+  render() {
+    return (
+      <ul>
+        {this.props.recipes.map(recipe => (
+          <li key={recipe._id}>
+            {recipe.title}{' '}
+            <button
+              style={{ backgroundColor: 'transparent' }}
+              onClick={() => this.props.handleDelete(recipe._id)}
+            >
+              <FaTimesCircle color='rgb(194, 57, 42)' size={20} />
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+}
+```
+
+## Editing a Recipe
+
+EditRecipe.js:
+
+```js
+import React from 'react';
+
+class EditRecipe extends React.Component {
+  state = {
+    recipe: [],
+    isLoading: false
+  };
+
+  componentDidMount() {
+    this.setState({ isLoading: true });
+    fetch(`http://localhost:5000/api/recipes/${this.props.recipeid}`)
+      .then(response => response.json())
+      .then(recipe =>
+        this.setState({
+          recipe: recipe,
+          isLoading: false
+        })
+      );
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>EDIT RECIPE</h3>
+        {this.state.recipe.title}
+      </div>
+    );
+  }
+}
+
+export default EditRecipe;
+```
+
+Add a link in maintainance:
+
+```js
+class ListRecipes extends Component {
+  render() {
+    return (
+      <ul>
+        {this.props.recipes.map(recipe => (
+          <li key={recipe._id}>
+            <Link to={`/editrecipe/${recipe._id}`}>{recipe.title}</Link>{' '}
+            <button
+              style={{ backgroundColor: 'transparent', border: 'none' }}
+              onClick={() => this.props.handleDelete(recipe._id)}
+            >
+              <FaTimesCircle color='rgb(194, 57, 42)' size={20} />
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+}
+```
+
+Expand edit form:
+
+```js
+import React from 'react';
+
+class EditRecipe extends React.Component {
+  state = {
+    recipe: [],
+    isLoading: false
+  };
+
+  componentDidMount() {
+    this.setState({ isLoading: true });
+    fetch(`http://localhost:5000/api/recipes/${this.props.recipeId}`)
+      .then(response => response.json())
+      .then(recipe =>
+        this.setState({
+          recipe: recipe,
+          isLoading: false
+        })
+      );
+  }
+
+  handleSubmit() {
+    return false;
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>EDIT RECIPE</h3>
+        <form onSubmit={this.handleSubmit}>
+          <input
+            type='text'
+            placeholder='Recipe Title'
+            name='title'
+            value={this.state.recipe.title}
+          />
+          <input
+            type='text'
+            placeholder='Image'
+            name='image'
+            value={this.state.recipe.image}
+          />
+          <textarea
+            type='text'
+            placeholder='Description'
+            name='description'
+            value={this.state.recipe.description}
+          />
+          <button>Update</button>
+        </form>
+      </div>
+    );
+  }
+}
+
+export default EditRecipe;
 ```
