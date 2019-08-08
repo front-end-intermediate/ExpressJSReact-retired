@@ -10,6 +10,15 @@ require('dotenv').config();
 
 const app = express();
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept',
+  );
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  next();
+});
 app.use(fileUpload());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ extended: false }));
@@ -37,6 +46,6 @@ const PORT = process.env.PORT || 5000;
 mongoose
   .connect(dataBaseURL, { useNewUrlParser: true })
   .then(() => console.log('MongoDb connected'))
-  .catch(err => console.log(err));
+  .catch(err => console.warn(err));
 
 app.listen(PORT, () => console.log(`Server running at port ${PORT}`));
