@@ -1,4 +1,5 @@
 # Express and React
+
 - [Express and React](#express-and-react)
   - [Homework](#homework)
   - [Create a React project:](#create-a-react-project)
@@ -8,15 +9,15 @@
   - [Multiple Components](#multiple-components)
   - [Single Page Routing](#single-page-routing)
   - [Recipe Details](#recipe-details)
-  - [ADDING](#adding)
+  - [ADDITIONS](#additions)
   - [react-icons](#react-icons)
   - [Editing a Recipe](#editing-a-recipe)
 
 ## Homework
 
-You should continue to build out the details component. 
+You should continue to build out the details component.
 
-This project is a template for your final project which **must** include an Express API as well as a font end written in React. 
+This project is a template for your final project which **must** include an Express API as well as a font end written in React.
 
 ## Create a React project:
 
@@ -183,11 +184,9 @@ class Recipe extends React.Component {
 }
 
 export default Recipe;
-
 ```
 
 Copy the CSS from the vanillajs public folder into index.css.
-
 
 ## Single Page Routing
 
@@ -251,7 +250,6 @@ class Recipes extends React.Component {
 }
 
 export default Recipes;
-
 ```
 
 Edit the Recipe component:
@@ -298,7 +296,6 @@ class Recipe extends React.Component {
 }
 
 export default Recipe;
-
 ```
 
 The Recipe items will link to a new RecipeDetail component:
@@ -319,7 +316,6 @@ class RecipeDetail extends React.Component {
 }
 
 export default RecipeDetail;
-
 ```
 
 Edit the Recipe component to remove the details:
@@ -354,7 +350,6 @@ class Recipe extends React.Component {
 }
 
 export default Recipe;
-
 ```
 
 ## Recipe Details
@@ -408,7 +403,6 @@ class RecipeDetail extends React.Component {
 }
 
 export default RecipeDetail;
-
 ```
 
 ```js
@@ -416,7 +410,7 @@ return (
   <div>
     <pre>{JSON.stringify(this.state.recipe, null, 2)}</pre>
   </div>
-)
+);
 ```
 
 To illustrate some issues with the buildout of RecipeDetail:
@@ -476,7 +470,6 @@ class RecipeDetail extends React.Component {
 }
 
 export default RecipeDetail;
-
 ```
 
 One solution:
@@ -539,38 +532,40 @@ class RecipeDetail extends React.Component {
 }
 
 export default RecipeDetail;
-
 ```
 
-## ADDING
+## ADDITIONS
+
+Add a component to allow the centralization of maintenance functions.
+
+RecipeMaintenance.js:
 
 ```js
 import React, { Component } from 'react';
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   render() {
     return (
       <div>
-          <h3>Add Recipe Form</h3>
-          <form>
-            <input type="text" placeholder="Recipe name" />
-            <input type="text" placeholder="Recipe image" />
-            <textarea type="text" placeholder="Recipe description" />
-            <button type="submit">Add Recipe</button>
-          </form>
-        </div>
+        <h3>Add Recipe Form</h3>
+        <form>
+          <input type='text' placeholder='Recipe name' />
+          <input type='text' placeholder='Recipe image' />
+          <textarea type='text' placeholder='Recipe description' />
+          <button type='submit'>Add Recipe</button>
+        </form>
+      </div>
     );
   }
 }
 
-export default RecipeMaintainance;
-
+export default RecipeMaintenance;
 ```
 
 ```js
 import React, { Component } from 'react';
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   createRecipe(e) {
     e.preventDefault();
     console.log('making a recipe');
@@ -579,25 +574,25 @@ class RecipeMaintainance extends Component {
   render() {
     return (
       <div>
-          <h3>Add Recipe Form</h3>
-          <form onSubmit={e => this.createRecipe(e)}>
-            <input type="text" placeholder="Recipe name" />
-            <input type="text" placeholder="Recipe image" />
-            <textarea type="text" placeholder="Recipe description" />
-            <button type="submit">Add Recipe</button>
-          </form>
-        </div>
+        <h3>Add Recipe Form</h3>
+        <form onSubmit={e => this.createRecipe(e)}>
+          <input type='text' placeholder='Recipe name' />
+          <input type='text' placeholder='Recipe image' />
+          <textarea type='text' placeholder='Recipe description' />
+          <button type='submit'>Add Recipe</button>
+        </form>
+      </div>
     );
   }
 }
 
-export default RecipeMaintainance;
+export default RecipeMaintenance;
 ```
 
 ```js
 import React, { Component } from 'react';
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   nameRef = React.createRef();
   imageRef = React.createRef();
   descriptionRef = React.createRef();
@@ -613,38 +608,37 @@ class RecipeMaintainance extends Component {
         <h3>Add Recipe Form</h3>
         <form onSubmit={e => this.createRecipe(e)}>
           <input
-            type="text"
-            name="name"
-            placeholder="Recipe name"
+            type='text'
+            name='name'
+            placeholder='Recipe name'
             ref={this.nameRef}
           />
           <input
-            type="text"
-            name="image"
-            placeholder="Recipe image"
+            type='text'
+            name='image'
+            placeholder='Recipe image'
             ref={this.imageRef}
           />
           <textarea
-            type="text"
-            name="description"
-            placeholder="Recipe description"
+            type='text'
+            name='description'
+            placeholder='Recipe description'
             ref={this.descriptionRef}
           />
-          <button type="submit">Add Recipe</button>
+          <button type='submit'>Add Recipe</button>
         </form>
       </div>
     );
   }
 }
 
-export default RecipeMaintainance;
-
+export default RecipeMaintenance;
 ```
 
 ```
 import React, { Component } from 'react';
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   nameRef = React.createRef();
   imageRef = React.createRef();
   descriptionRef = React.createRef();
@@ -689,7 +683,7 @@ class RecipeMaintainance extends Component {
   }
 }
 
-export default RecipeMaintainance;
+export default RecipeMaintenance;
 
 ```
 
@@ -697,7 +691,7 @@ export default RecipeMaintainance;
 import React from 'react';
 import Recipes from './Recipes';
 import RecipeDetails from './RecipeDetails';
-import RecipeMaintainance from './RecipeMaintainance';
+import RecipeMaintenance from './RecipeMaintenance';
 
 import { Router } from '@reach/router';
 
@@ -726,7 +720,7 @@ class App extends React.Component {
         <Router>
           <Recipes path="/" recipes={this.state.recipes} />
           <RecipeDetails path="/recipe/:recipeId" />
-          <RecipeMaintainance path="/maintainance" addRecipe={this.addRecipe} />
+          <RecipeMaintenance path="/maintenance" addRecipe={this.addRecipe} />
         </Router>
       </div>
     );
@@ -741,7 +735,7 @@ export default App;
 import React from 'react';
 import Recipes from './Recipes';
 import RecipeDetails from './RecipeDetails';
-import RecipeMaintainance from './RecipeMaintainance';
+import RecipeMaintenance from './RecipeMaintenance';
 
 import { Router } from '@reach/router';
 
@@ -771,7 +765,7 @@ class App extends React.Component {
         <Router>
           <Recipes path="/" recipes={this.state.recipes} />
           <RecipeDetails path="/recipe/:recipeId" />
-          <RecipeMaintainance path="/maintainance" addRecipe={this.addRecipe} />
+          <RecipeMaintenance path="/maintenance" addRecipe={this.addRecipe} />
         </Router>
       </div>
     );
@@ -803,7 +797,7 @@ export default App;
 ```js
 import React, { Component } from 'react';
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   titleRef = React.createRef();
   imageRef = React.createRef();
   descriptionRef = React.createRef();
@@ -813,7 +807,7 @@ class RecipeMaintainance extends Component {
     const recipe = {
       title: this.titleRef.current.value,
       image: this.imageRef.current.value,
-      description: this.descriptionRef.current.value,
+      description: this.descriptionRef.current.value
     };
     this.props.addRecipe(recipe);
   }
@@ -824,34 +818,34 @@ class RecipeMaintainance extends Component {
         <h3>Add Recipe Form</h3>
         <form onSubmit={e => this.createRecipe(e)}>
           <input
-            type="text"
-            name="title"
-            placeholder="Recipe name"
+            type='text'
+            name='title'
+            placeholder='Recipe name'
             ref={this.titleRef}
           />
           <input
-            type="text"
-            name="image"
-            placeholder="Recipe image"
+            type='text'
+            name='image'
+            placeholder='Recipe image'
             ref={this.imageRef}
           />
           <textarea
-            type="text"
-            name="description"
-            placeholder="Recipe description"
+            type='text'
+            name='description'
+            placeholder='Recipe description'
             ref={this.descriptionRef}
           />
-          <button type="submit">Add Recipe</button>
+          <button type='submit'>Add Recipe</button>
         </form>
       </div>
     );
   }
 }
 
-export default RecipeMaintainance;
+export default RecipeMaintenance;
 ```
 
-Home Link. 
+Home Link.
 
 App.js:
 
@@ -865,18 +859,18 @@ render() {
       <Router>
         <Recipes path='/' recipes={this.state.recipes} />
         <RecipeDetails path='/recipe/:recipeId' />
-        <RecipeMaintainance path='/maintainance' addRecipe={this.addRecipe} />
+        <RecipeMaintenance path='/maintenance' addRecipe={this.addRecipe} />
       </Router>
     </>
   );
-  ```
+```
 
-  Import Link.
+Import Link.
 
-  css:
+css:
 
-  ```css
-  nav {
+```css
+nav {
   min-height: 3rem;
   background-color: #007eb6;
   margin-bottom: 1rem;
@@ -889,7 +883,7 @@ nav a {
 }
 ```
 
-Adding delete to RecipeMaintainance:
+Adding delete to RecipeMaintenance:
 
 ```js
 import React, { Component } from 'react';
@@ -915,7 +909,7 @@ class ListRecipes extends Component {
   }
 }
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   titleRef = React.createRef();
   imageRef = React.createRef();
   descriptionRef = React.createRef();
@@ -961,8 +955,7 @@ class RecipeMaintainance extends Component {
   }
 }
 
-export default RecipeMaintainance;
-
+export default RecipeMaintenance;
 ```
 
 Lifting state up and the 'this' keyowrd:
@@ -972,7 +965,7 @@ import React from 'react';
 import Recipes from './Recipes';
 import RecipeDetails from './RecipeDetails';
 import NavBar from './NavBar';
-import RecipeMaintainance from './RecipeMaintainance';
+import RecipeMaintenance from './RecipeMaintenance';
 
 import { Router, Link } from '@reach/router';
 
@@ -1024,17 +1017,16 @@ class App extends React.Component {
   }
 
   render() {
-    
     return (
       <>
         <nav>
-          <Link to='/'>Home</Link> <Link to='/maintainance'>Maintainance</Link>
+          <Link to='/'>Home</Link> <Link to='/maintenance'>Maintenance</Link>
         </nav>
         <Router>
           <Recipes path='/' recipes={this.state.recipes} />
           <RecipeDetails path='/recipe/:recipeId' />
-          <RecipeMaintainance
-            path='/maintainance'
+          <RecipeMaintenance
+            path='/maintenance'
             addRecipe={this.addRecipe}
             recipes={this.state.recipes}
             handleDelete={this.handleDelete}
@@ -1046,12 +1038,11 @@ class App extends React.Component {
 }
 
 export default App;
-
 ```
 
 ## react-icons
 
-npm install react-icons and use them in the maintainance interface
+npm install react-icons and use them in the maintenance interface
 
 ```js
 import React, { Component } from 'react';
@@ -1114,10 +1105,9 @@ class EditRecipe extends React.Component {
 }
 
 export default EditRecipe;
-
 ```
 
-Add a link in maintainance:
+Add a link in maintenance:
 
 ```js
 class ListRecipes extends Component {
@@ -1199,5 +1189,4 @@ class EditRecipe extends React.Component {
 }
 
 export default EditRecipe;
-
 ```
