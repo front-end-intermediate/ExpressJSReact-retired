@@ -9,8 +9,11 @@
   - [Multiple Components](#multiple-components)
   - [Single Page Routing](#single-page-routing)
   - [Recipe Details](#recipe-details)
-  - [ADDING](#adding)
+  - [ADDITIONS](#additions)
+  - [Adding a NavBar](#adding-a-navbar)
+  - [Another State](#another-state)
   - [react-icons](#react-icons)
+  - [Notes](#notes)
   - [Editing a Recipe](#editing-a-recipe)
 
 ## Homework
@@ -534,12 +537,33 @@ class RecipeDetail extends React.Component {
 export default RecipeDetail;
 ```
 
-## ADDING
+## ADDITIONS
+
+A graceful shutdown for ExpressJS:
+
+```js
+process.on('SIGINT', shutdown);
+
+function shutdown() {
+  console.log('graceful shutdown express');
+  server.close(function() {
+    console.log('closed express');
+  });
+}
+
+const server = app.listen(PORT, () =>
+  console.log(`Server running at port ${PORT}`)
+);
+```
+
+Add a component to allow the centralization of maintenance functions.
+
+RecipeMaintenance.js:
 
 ```js
 import React, { Component } from 'react';
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   render() {
     return (
       <div>
@@ -555,13 +579,27 @@ class RecipeMaintainance extends Component {
   }
 }
 
-export default RecipeMaintainance;
+export default RecipeMaintenance;
 ```
+
+Import the component into App.js and add it to the routing scheme.
+
+```js
+<Router>
+  <Recipes path='/' recipes={this.state.recipes} />
+  <RecipeDetails path='/recipe/:recipeId' />
+  <RecipeMaintenance path='/maintenance' />
+</Router>
+```
+
+Test the path in the browser.
+
+Add onSubmit and createRecipe:
 
 ```js
 import React, { Component } from 'react';
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   createRecipe(e) {
     e.preventDefault();
     console.log('making a recipe');
@@ -582,13 +620,17 @@ class RecipeMaintainance extends Component {
   }
 }
 
-export default RecipeMaintainance;
+export default RecipeMaintenance;
 ```
+
+Test the button.
+
+Outfit the form with refs:
 
 ```js
 import React, { Component } from 'react';
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   nameRef = React.createRef();
   imageRef = React.createRef();
   descriptionRef = React.createRef();
@@ -628,13 +670,15 @@ class RecipeMaintainance extends Component {
   }
 }
 
-export default RecipeMaintainance;
+export default RecipeMaintenance;
 ```
 
-```
+Complete the createRecipe function:
+
+```js
 import React, { Component } from 'react';
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   nameRef = React.createRef();
   imageRef = React.createRef();
   descriptionRef = React.createRef();
@@ -644,7 +688,7 @@ class RecipeMaintainance extends Component {
     const recipe = {
       name: this.nameRef.current.value,
       image: this.imageRef.current.value,
-      description: this.descriptionRef.current.value,
+      description: this.descriptionRef.current.value
     };
     this.props.addRecipe(recipe);
   }
@@ -655,45 +699,46 @@ class RecipeMaintainance extends Component {
         <h3>Add Recipe Form</h3>
         <form onSubmit={e => this.createRecipe(e)}>
           <input
-            type="text"
-            name="name"
-            placeholder="Recipe name"
+            type='text'
+            name='name'
+            placeholder='Recipe name'
             ref={this.nameRef}
           />
           <input
-            type="text"
-            name="image"
-            placeholder="Recipe image"
+            type='text'
+            name='image'
+            placeholder='Recipe image'
             ref={this.imageRef}
           />
           <textarea
-            type="text"
-            name="description"
-            placeholder="Recipe description"
+            type='text'
+            name='description'
+            placeholder='Recipe description'
             ref={this.descriptionRef}
           />
-          <button type="submit">Add Recipe</button>
+          <button type='submit'>Add Recipe</button>
         </form>
       </div>
     );
   }
 }
 
-export default RecipeMaintainance;
-
+export default RecipeMaintenance;
 ```
 
-```
+Add the addRecipe function to App.js and send it as a prop to RecipeMaintenance:
+
+```js
 import React from 'react';
 import Recipes from './Recipes';
 import RecipeDetails from './RecipeDetails';
-import RecipeMaintainance from './RecipeMaintainance';
+import RecipeMaintenance from './RecipeMaintenance';
 
 import { Router } from '@reach/router';
 
 class App extends React.Component {
   state = {
-    recipes: [],
+    recipes: []
   };
 
   componentDidMount() {
@@ -701,8 +746,8 @@ class App extends React.Component {
       .then(response => response.json())
       .then(recipes =>
         this.setState({
-          recipes: recipes,
-        }),
+          recipes: recipes
+        })
       );
   }
 
@@ -714,9 +759,9 @@ class App extends React.Component {
     return (
       <div>
         <Router>
-          <Recipes path="/" recipes={this.state.recipes} />
-          <RecipeDetails path="/recipe/:recipeId" />
-          <RecipeMaintainance path="/maintainance" addRecipe={this.addRecipe} />
+          <Recipes path='/' recipes={this.state.recipes} />
+          <RecipeDetails path='/recipe/:recipeId' />
+          <RecipeMaintenance path='/maintenance' addRecipe={this.addRecipe} />
         </Router>
       </div>
     );
@@ -724,20 +769,21 @@ class App extends React.Component {
 }
 
 export default App;
-
 ```
 
-```
+Collect the state using a spread operator and log that to the console:
+
+```js
 import React from 'react';
 import Recipes from './Recipes';
 import RecipeDetails from './RecipeDetails';
-import RecipeMaintainance from './RecipeMaintainance';
+import RecipeMaintenance from './RecipeMaintenance';
 
 import { Router } from '@reach/router';
 
 class App extends React.Component {
   state = {
-    recipes: [],
+    recipes: []
   };
 
   componentDidMount() {
@@ -745,8 +791,8 @@ class App extends React.Component {
       .then(response => response.json())
       .then(recipes =>
         this.setState({
-          recipes: recipes,
-        }),
+          recipes: recipes
+        })
       );
   }
 
@@ -759,9 +805,9 @@ class App extends React.Component {
     return (
       <div>
         <Router>
-          <Recipes path="/" recipes={this.state.recipes} />
-          <RecipeDetails path="/recipe/:recipeId" />
-          <RecipeMaintainance path="/maintainance" addRecipe={this.addRecipe} />
+          <Recipes path='/' recipes={this.state.recipes} />
+          <RecipeDetails path='/recipe/:recipeId' />
+          <RecipeMaintenance path='/maintenance' addRecipe={this.addRecipe} />
         </Router>
       </div>
     );
@@ -769,31 +815,33 @@ class App extends React.Component {
 }
 
 export default App;
-
 ```
 
+Expand the function to use our api. Note the fetch options:
+
+```js
+addRecipe = recipe => {
+  console.log(recipe);
+  fetch(`http://localhost:5000/api/recipes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(recipe)
+  })
+    .then(response => response.json())
+    .then(recipe => console.log(recipe));
+};
 ```
-  addRecipe = recipe => {
-    console.log(recipe);
-    // const recipes = [...this.state.recipes];
-    // recipes.unshift(recipe);
-    fetch(`http://localhost:5000/api/recipes`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(recipe),
-    })
-      .then(response => response.json())
-      .then(recipe => console.log(recipe));
-    // this.setState({ recipes: recipes });
-  };
-```
+
+Test the form.
+
+Ooops, wrong name. Swap name for title:
 
 ```js
 import React, { Component } from 'react';
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   titleRef = React.createRef();
   imageRef = React.createRef();
   descriptionRef = React.createRef();
@@ -838,10 +886,12 @@ class RecipeMaintainance extends Component {
   }
 }
 
-export default RecipeMaintainance;
+export default RecipeMaintenance;
 ```
 
-Home Link.
+## Adding a NavBar
+
+Create a Home Link.
 
 App.js:
 
@@ -855,13 +905,15 @@ render() {
       <Router>
         <Recipes path='/' recipes={this.state.recipes} />
         <RecipeDetails path='/recipe/:recipeId' />
-        <RecipeMaintainance path='/maintainance' addRecipe={this.addRecipe} />
+        <RecipeMaintenance path='/maintenance' addRecipe={this.addRecipe} />
       </Router>
     </>
   );
 ```
 
-Import Link.
+Don't forget to import Link from reach router.
+
+Create some css to support the new element:
 
 css:
 
@@ -879,7 +931,15 @@ nav a {
 }
 ```
 
-Adding delete to RecipeMaintainance:
+Add a link to Maintenance:
+
+```js
+<nav>
+  <Link to='/'>Home</Link> <Link to='/maintenance'>Maintenance</Link>
+</nav>
+```
+
+Adding delete to RecipeMaintenance:
 
 ```js
 import React, { Component } from 'react';
@@ -905,7 +965,7 @@ class ListRecipes extends Component {
   }
 }
 
-class RecipeMaintainance extends Component {
+class RecipeMaintenance extends Component {
   titleRef = React.createRef();
   imageRef = React.createRef();
   descriptionRef = React.createRef();
@@ -951,17 +1011,32 @@ class RecipeMaintainance extends Component {
   }
 }
 
-export default RecipeMaintainance;
+export default RecipeMaintenance;
 ```
 
-Lifting state up and the 'this' keyowrd:
+Be sure to pass the recipes to the component from App.js:
+
+```js
+<RecipeMaintenance
+  path='/maintenance'
+  addRecipe={this.addRecipe}
+  recipes={this.state.recipes}
+/>
+```
+
+## Another State
+
+Lifting state up and the 'this' keyword.
+
+See [this](https://github.com/front-end-summer19/React-Intro#extending-classes)
+
+Add a constructor to App.js and create the handleDelete function:
 
 ```js
 import React from 'react';
 import Recipes from './Recipes';
 import RecipeDetails from './RecipeDetails';
-import NavBar from './NavBar';
-import RecipeMaintainance from './RecipeMaintainance';
+import RecipeMaintenance from './RecipeMaintenance';
 
 import { Router, Link } from '@reach/router';
 
@@ -986,8 +1061,6 @@ class App extends React.Component {
 
   addRecipe = recipe => {
     console.log(recipe);
-    // const recipes = [...this.state.recipes];
-    // recipes.unshift(recipe);
     fetch(`http://localhost:5000/api/recipes`, {
       method: 'POST',
       headers: {
@@ -997,7 +1070,6 @@ class App extends React.Component {
     })
       .then(response => response.json())
       .then(recipe => console.log(recipe));
-    // this.setState({ recipes: recipes });
   };
 
   handleDelete(id) {
@@ -1016,13 +1088,13 @@ class App extends React.Component {
     return (
       <>
         <nav>
-          <Link to='/'>Home</Link> <Link to='/maintainance'>Maintainance</Link>
+          <Link to='/'>Home</Link> <Link to='/maintenance'>Maintenance</Link>
         </nav>
         <Router>
           <Recipes path='/' recipes={this.state.recipes} />
           <RecipeDetails path='/recipe/:recipeId' />
-          <RecipeMaintainance
-            path='/maintainance'
+          <RecipeMaintenance
+            path='/maintenance'
             addRecipe={this.addRecipe}
             recipes={this.state.recipes}
             handleDelete={this.handleDelete}
@@ -1036,9 +1108,40 @@ class App extends React.Component {
 export default App;
 ```
 
+and
+
+```js
+<ListRecipes
+  recipes={this.props.recipes}
+  handleDelete={this.props.handleDelete}
+/>
+```
+
+Update the addRecipe function in App.js:
+
+```js
+addRecipe = recipe => {
+  this.setState({ isLoading: true });
+  fetch(`http://localhost:5000/api/recipes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(recipe)
+  })
+    .then(response => response.json())
+    .then(recipe => console.log(recipe));
+  const recipes = [...this.state.recipes];
+  recipes.unshift(recipe);
+  this.setState({ recipes: recipes, isLoading: false });
+};
+```
+
+Test deleting a recipe.
+
 ## react-icons
 
-npm install react-icons and use them in the maintainance interface
+npm install react-icons and use them in the maintenance interface:
 
 ```js
 import React, { Component } from 'react';
@@ -1064,6 +1167,14 @@ class ListRecipes extends Component {
   }
 }
 ```
+
+Note the use of inline css.
+
+Try removing the border:
+
+`style={{ backgroundColor: 'transparent', border: 'none' }}`
+
+## Notes
 
 ## Editing a Recipe
 
@@ -1103,7 +1214,7 @@ class EditRecipe extends React.Component {
 export default EditRecipe;
 ```
 
-Add a link in maintainance:
+Add a link in maintenance:
 
 ```js
 class ListRecipes extends Component {
