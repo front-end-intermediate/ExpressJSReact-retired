@@ -22,7 +22,7 @@ v 1.1
 
 ## Homework
 
-Use Code Sandbox to read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect documentation](https://reactjs.org/docs/hooks-effect.html).
+Use Code Sandbox to read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect](https://reactjs.org/docs/hooks-effect.html) documentation.
 
 This project is a template for your final project which **must** include an Express API as well as a front end written in React.
 
