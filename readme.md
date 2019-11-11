@@ -4,6 +4,7 @@ v 1.1
 
 - [Express and React](#express-and-react)
   - [Homework](#homework)
+  - [Code Sandbox](#code-sandbox)
   - [Create a React project:](#create-a-react-project)
   - [The First Component](#the-first-component)
   - [Component Lifecycle](#component-lifecycle)
@@ -20,9 +21,157 @@ v 1.1
 
 ## Homework
 
-You should continue to build out the details component.
+tbd.
 
-This project is a template for your final project which **must** include an Express API as well as a font end written in React.
+This project is a template for your final project which **must** include an Express API as well as a front end written in React.
+
+## Code Sandbox
+
+`https://codesandbox.io`
+
+`https://developer.github.com/v3/repos/#list-organization-repositories`
+
+`https://api.github.com/orgs/facebook/repos`
+
+```js
+import React from "react";
+import ReactDOM from "react-dom";
+
+import "./styles.css";
+
+class Github extends React.Component {
+  state = {
+    repos: []
+  };
+
+  render() {
+    return (
+      <div>
+        <h1>Repos</h1>
+        <ul>{/* list repos here */}</ul>
+      </div>
+    );
+  }
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<Github />, rootElement);
+```
+
+```js
+  componentDidMount(){
+    fetch('https://api.github.com/orgs/facebook/repos')
+    .then(res => res.json())
+    .then(json => this.setState({repos: json}))
+  }
+```
+
+```js
+render() {
+    return (
+      <div>
+        <h1>Repos</h1>
+        <ul>
+          {this.state.repos.map( repo => (
+             <li key={repo.id}>{repo.full_name}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+```
+
+Loading flag
+
+```js
+class Github extends React.Component {
+  state = {
+    loading: false,
+    repos: []
+  };
+
+  componentDidMount(){
+    this.setState({loading: true})
+    fetch('https://api.github.com/orgs/facebook/repos')
+    .then(res => res.json())
+    .then(json => this.setState({repos: json, loading: false}))
+    .catch( () => this.setState({loading: false}))
+  }
+
+  render() {
+    if(this.state.loading){
+      return <div>Loading repos...</div>
+    }
+    return (
+      <div>
+        <h1>Repos</h1>
+        <ul>
+          {this.state.repos.map( repo => (
+            <li key={repo.id}>{repo.full_name}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+}
+```
+
+Refactor to Hooks
+
+Import `useState` hook:
+
+`import React, {useState} from "react";`
+
+Create a new function:
+
+```js
+function GithubHooks(){
+const [loading, setLoading] = useState(false)
+const [repos, setRepos] = useState([])
+
+  if(loading){
+    return <div>Loading repos...</div>
+  }
+
+  return (
+    <div>
+      <h1>Repos</h1>
+      <ul>
+        {repos.map( repo => (
+          <li key={repo.id}>{repo.full_name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+Fetch the data.
+
+Import `useEffect` hook:
+
+`import React, {useState, useEffect} from "react";`
+
+Set the data with useEffect:
+
+```js
+useEffect( () => {
+  setLoading(true)
+  fetch('https://api.github.com/orgs/facebook/repos')
+  .then(res => res.json())
+  .then(json => {
+    setLoading(false)
+    setRepos(json)
+  })
+  .catch(setLoading(false));
+}, [])
+```
+
+Render the component to the DOM:
+
+`ReactDOM.render(<GithubHooks />, rootElement);`
+
+
 
 ## Create a React project:
 
