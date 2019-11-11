@@ -4,7 +4,8 @@ v 1.1
 
 - [Express and React](#express-and-react)
   - [Homework](#homework)
-  - [Code Sandbox](#code-sandbox)
+  - [Refactoring Exercise: Code Sandbox](#refactoring-exercise-code-sandbox)
+    - [Refactor to Hooks](#refactor-to-hooks)
   - [Create a React project:](#create-a-react-project)
   - [The First Component](#the-first-component)
   - [Component Lifecycle](#component-lifecycle)
@@ -21,11 +22,11 @@ v 1.1
 
 ## Homework
 
-tbd.
+Use Code Sandbox to read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect documentation](https://reactjs.org/docs/hooks-effect.html).
 
 This project is a template for your final project which **must** include an Express API as well as a front end written in React.
 
-## Code Sandbox
+## Refactoring Exercise: Code Sandbox
 
 `https://codesandbox.io`
 
@@ -58,6 +59,8 @@ const rootElement = document.getElementById("root");
 ReactDOM.render(<Github />, rootElement);
 ```
 
+Fetch the data:
+
 ```js
   componentDidMount(){
     fetch('https://api.github.com/orgs/facebook/repos')
@@ -65,6 +68,8 @@ ReactDOM.render(<Github />, rootElement);
     .then(json => this.setState({repos: json}))
   }
 ```
+
+Render the content:
 
 ```js
 render() {
@@ -81,7 +86,7 @@ render() {
   }
 ```
 
-Loading flag
+Add a Loading flag:
 
 ```js
 class Github extends React.Component {
@@ -116,13 +121,13 @@ class Github extends React.Component {
 }
 ```
 
-Refactor to Hooks
+### Refactor to Hooks
 
 Import `useState` hook:
 
 `import React, {useState} from "react";`
 
-Create a new function:
+Create a new function under the class component:
 
 ```js
 function GithubHooks(){
@@ -146,7 +151,7 @@ const [repos, setRepos] = useState([])
 }
 ```
 
-Fetch the data.
+Fetching the data.
 
 Import `useEffect` hook:
 
@@ -171,7 +176,7 @@ Render the component to the DOM:
 
 `ReactDOM.render(<GithubHooks />, rootElement);`
 
-
+[useEffect documentation](https://reactjs.org/docs/hooks-effect.html)
 
 ## Create a React project:
 
