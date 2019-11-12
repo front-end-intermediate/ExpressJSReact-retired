@@ -178,6 +178,50 @@ Render the component to the DOM:
 
 [useEffect documentation](https://reactjs.org/docs/hooks-effect.html)
 
+Final component
+
+```js
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
+
+import "./styles.css";
+
+function GithubHooks() {
+  const [loading, setLoading] = useState(false);
+  const [repos, setRepos] = useState([]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("https://api.github.com/orgs/facebook/repos")
+      .then(res => res.json())
+      .then(json => {
+        setLoading(false);
+        setRepos(json);
+      })
+      .catch(setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <div>Loading repos...</div>;
+  }
+
+  return (
+    <div>
+      <h1>Repos</h1>
+      <ul>
+        {repos.map(repo => (
+          <li key={repo.id}>{repo.full_name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<GithubHooks />, rootElement);
+
+```
+
 ## Create a React project:
 
 `npx create-react-app client`
