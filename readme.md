@@ -1,16 +1,18 @@
 # Express and React
 
-v 1.1
+v 1.2
 
 - [Express and React](#express-and-react)
   - [Homework](#homework)
   - [Refactoring Exercise: Code Sandbox](#refactoring-exercise-code-sandbox)
     - [Refactor to Hooks](#refactor-to-hooks)
-  - [Create a React project:](#create-a-react-project)
+    - [useEffect](#useeffect)
+  - [Create a React project](#create-a-react-project)
   - [The First Component](#the-first-component)
-  - [Component Lifecycle](#component-lifecycle)
   - [CORS](#cors)
+  - [Component Lifecycle](#component-lifecycle)
   - [Multiple Components](#multiple-components)
+  - [Convert to Hooks](#convert-to-hooks)
   - [Single Page Routing](#single-page-routing)
   - [Recipe Details](#recipe-details)
   - [ADDITIONS](#additions)
@@ -22,7 +24,7 @@ v 1.1
 
 ## Homework
 
-Use Code Sandbox to read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect](https://reactjs.org/docs/hooks-effect.html) documentation.
+Using Code Sandbox, read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect](https://reactjs.org/docs/hooks-effect.html) documentation.
 
 This project is a template for your final project which **must** include an Express API as well as a front end written in React.
 
@@ -151,9 +153,11 @@ const [repos, setRepos] = useState([])
 }
 ```
 
+### useEffect
+
 Fetching the data.
 
-Import `useEffect` hook:
+Import [useEffect](https://reactjs.org/docs/hooks-effect.html) hook:
 
 `import React, {useState, useEffect} from "react";`
 
@@ -175,8 +179,6 @@ useEffect( () => {
 Render the component to the DOM:
 
 `ReactDOM.render(<GithubHooks />, rootElement);`
-
-[useEffect documentation](https://reactjs.org/docs/hooks-effect.html)
 
 Final component
 
@@ -219,10 +221,11 @@ function GithubHooks() {
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(<GithubHooks />, rootElement);
-
 ```
 
-## Create a React project:
+## Create a React project
+
+cd into the top level of the project directory and:
 
 `npx create-react-app client`
 
@@ -239,7 +242,9 @@ Edit the package.json scripts:
 "dev": "concurrently \"npm run server\" \"npm run client\""
 ```
 
-Change the PORT in `.env` to 5000.
+Note: you'll need to set the old dev script to 'server'.
+
+Change the PORT in `.env` and in server.js to 5000.
 
 cd into the root and run `npm run dev`.
 
@@ -266,7 +271,7 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    fetch(`http://localhost:5001/api/recipes`)
+    fetch(`http://localhost:5000/api/recipes`)
       .then(response => response.json())
       .then(data => console.log(data));
   }
@@ -281,6 +286,22 @@ class App extends React.Component {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+## CORS
+
+CORs. In `server.js`:
+
+```js
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  next();
+});
 ```
 
 ## Component Lifecycle
@@ -325,22 +346,6 @@ class Recipe extends React.Component {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
-```
-
-## CORS
-
-CORs. In `server.js`:
-
-```js
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  next();
-});
 ```
 
 ## Multiple Components
@@ -391,9 +396,85 @@ export default Recipe;
 
 Copy the CSS from the vanillajs public folder into index.css.
 
+## Convert to Hooks
+
+First practice converting from class to function with Recipe.js:
+
+```js
+import React from "react";
+
+function Recipe(props) {
+  const {
+    title,
+    name,
+    description,
+    image,
+    ingredients,
+    preparation
+  } = props.recipe;
+  return (
+    <>
+      <img
+        src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${image}`}
+        alt={name}
+      />
+      <h3>{title}</h3>
+      <p>{description}</p>
+      <h4>Ingredients</h4>
+      <ul>
+        {ingredients.map(ingredient => (
+          <li key={ingredient}>{ingredient}</li>
+        ))}
+      </ul>
+      <h4>Preparation</h4>
+      <ul>
+        {preparation.map(prep => (
+          <li key={prep.step}>{prep.step}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+export default Recipe;
+
+```
+
+Then tackle the App component:
+
+```js
+import React, { useState, useEffect } from "react";
+import Recipe from "./Recipe";
+
+function App() {
+  const [recipes, setRecipes] = useState([]);
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/recipes`)
+      .then(response => response.json())
+      .then(json => {
+        setRecipes(json);
+      });
+  });
+
+  return (
+    <div>
+      {/* <pre>{JSON.stringify(this.state.recipes, null, 2)}</pre> */}
+      {recipes.map(recipe => (
+        <Recipe key={recipe._id} recipe={recipe} />
+      ))}
+    </div>
+  );
+}
+
+export default App;
+```
+
 ## Single Page Routing
 
-Import reach router and import the router into App:
+`npm i @reach/router`
+
+npm import [reach router](https://reach.tech/router) and import the router into App:
 
 ```js
 import React from 'react';
@@ -422,7 +503,10 @@ class App extends React.Component {
         <h1>Recipes!</h1>
         <Router>
           <Recipes path='/' recipes={this.state.recipes} />
-          <RecipeDetail path='/recipe/:recipeId' recipes={this.state.recipes} />
+          <RecipeDetail
+          path="/recipe/:recipeId"
+          recipe={recipes.filter(recipe => recipe._id === recipe.id)}
+          s/>
         </Router>
       </div>
     );
@@ -458,47 +542,47 @@ export default Recipes;
 Edit the Recipe component:
 
 ```js
-import React from 'react';
-import { Link } from '@reach/router';
+import React from "react";
+import { Link } from "@reach/router";
 
-class Recipe extends React.Component {
-  render() {
-    const {
-      _id,
-      title,
-      description,
-      image,
-      ingredients,
-      preparation
-    } = this.props.recipe;
-    return (
-      <>
-        <img
-          src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${image}`}
-          alt={this.props.recipe.name}
-        />
-        <h3>
-          <Link to={`/recipe/${_id}`}>{title}</Link>
-        </h3>
-        <p>{description}</p>
-        <h4>Ingredients</h4>
-        <ul>
-          {ingredients.map(ingredient => (
-            <li>{ingredient}</li>
-          ))}
-        </ul>
-        <h4>Preparation</h4>
-        <ul>
-          {preparation.map(prep => (
-            <li>{prep.step}</li>
-          ))}
-        </ul>
-      </>
-    );
-  }
+function Recipe(props) {
+  const {
+    _id,
+    title,
+    name,
+    description,
+    image,
+    ingredients,
+    preparation
+  } = props.recipe;
+  return (
+    <>
+      <img
+        src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${image}`}
+        alt={name}
+      />
+      <h3>
+        <Link to={`/recipe/${_id}`}>{title}</Link>
+      </h3>
+      <p>{description}</p>
+      <h4>Ingredients</h4>
+      <ul>
+        {ingredients.map(ingredient => (
+          <li key={ingredient}>{ingredient}</li>
+        ))}
+      </ul>
+      <h4>Preparation</h4>
+      <ul>
+        {preparation.map(prep => (
+          <li key={prep.step}>{prep.step}</li>
+        ))}
+      </ul>
+    </>
+  );
 }
 
 export default Recipe;
+
 ```
 
 The Recipe items will link to a new RecipeDetail component:
@@ -521,7 +605,7 @@ class RecipeDetail extends React.Component {
 export default RecipeDetail;
 ```
 
-Edit the Recipe component to remove the details:
+Edit the Recipe component to remove the details leaving only the description:
 
 ```js
 import React from 'react';
