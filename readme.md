@@ -1,12 +1,14 @@
 # Express and React
 
-v 1.2
+v 1.3
 
 - [Express and React](#express-and-react)
   - [Homework](#homework)
   - [Refactoring Exercise: Code Sandbox](#refactoring-exercise-code-sandbox)
     - [Refactor to Hooks](#refactor-to-hooks)
     - [useEffect](#useeffect)
+  - [Exercise: React Front End](#exercise-react-front-end)
+  - [Own the Repo](#own-the-repo)
   - [Create a React project](#create-a-react-project)
   - [The First Component](#the-first-component)
   - [CORS](#cors)
@@ -223,15 +225,60 @@ const rootElement = document.getElementById("root");
 ReactDOM.render(<GithubHooks />, rootElement);
 ```
 
+## Exercise: React Front End
+
+Download the heroku deploy and reconstitute the `.env` file:
+
+```js
+NODE_ENV=development
+DATABASE=mongodb+srv://daniel:dd2345@recipes-3k4ea.mongodb.net/test?retryWrites=true&w=majority
+PORT=3000
+```
+
+npm install and run to test.
+
+## Own the Repo
+
+Kill the server, check the current origin, remove the origin and add a new one:
+
+```sh
+git remote -v
+git remote rm origin
+git remote add origin <your-new-github-repo>
+git push -u origin master
+```
+
 ## Create a React project
 
 cd into the top level of the project directory and:
 
 `npx create-react-app client`
 
-We could run the client by cd'ing into it but then we would have to run the server in a separate tab.
+```sh
+$ cd client
+$ rm src/*
+$ touch src/index.js
+```
 
-Install npm concurrently as dev dependency
+Create a simple start page in `index.js`:
+
+```js
+import React from "react";
+import ReactDOM from "react-dom";
+
+function HelloWorld() {
+  return <div>Hello world</div>;
+}
+
+ReactDOM.render(<HelloWorld />, document.querySelector("#root"));
+
+```
+
+Test the new page by cd'ing into the client and running `npm start`.
+
+We could run the client and server in a separate terminal tabs but we want an integrated application for deployment.
+
+cd into the top level of the project and Install [concurrently](https://www.npmjs.com/package/concurrently) as a dev dependency:
 
 `npm i -D concurrently`
 
@@ -239,30 +286,27 @@ Edit the package.json scripts:
 
 ```sh
 "client": "npm start --prefix client",
-"dev": "concurrently \"npm run server\" \"npm run client\""
+"dev": "concurrently \"npm run server\" \"npm run client\" --kill-others "
 ```
 
-Note: you'll need to set the old dev script to 'server'.
+Note: you'll need to set the old `dev` script to 'server'.
 
-Change the PORT in `.env` and in server.js to 5000.
+Since the React front end runs on port 3000 we'll change the PORT in `.env` and in server.js to 5000.
+
+Set a Proxy in client package.json:
+
+`"proxy": "http://localhost:5000"`
 
 cd into the root and run `npm run dev`.
 
 Note: any React specific npm installs need to be done in the client folder.
 
-Proxy in client package.json:
-
-`"proxy": "http://localhost:5000"`
-
-Clean up files in client.
-
 ## The First Component
 
-index.js:
+Create `components/App.js`:
 
 ```js
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './index.css';
 
 class App extends React.Component {
@@ -279,14 +323,15 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <p>Hello</p>
+        <p>Hello from App</p>
       </div>
     );
   }
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
 ```
+
+Load the front end to test. Make adjustments to index.js as needed.
 
 ## CORS
 
@@ -306,7 +351,7 @@ app.use((req, res, next) => {
 
 ## Component Lifecycle
 
-index.js:
+App.js:
 
 ```js
 import React from 'react';
@@ -350,7 +395,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ## Multiple Components
 
-Create a components folder in src and break the App and Recipe components into separate files.
+Break the App and Recipe components into separate files.
 
 Scaffold the Recipe component.
 
