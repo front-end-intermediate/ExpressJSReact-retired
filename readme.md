@@ -4,9 +4,6 @@ v 1.3
 
 - [Express and React](#express-and-react)
   - [Homework](#homework)
-  - [Refactoring Exercise: Code Sandbox](#refactoring-exercise-code-sandbox)
-    - [Refactor to Hooks](#refactor-to-hooks)
-    - [useEffect](#useeffect)
   - [Exercise: React Front End](#exercise-react-front-end)
   - [Own the Repo](#own-the-repo)
   - [Create a React project](#create-a-react-project)
@@ -15,6 +12,10 @@ v 1.3
   - [Component Lifecycle](#component-lifecycle)
   - [Multiple Components](#multiple-components)
   - [Convert to Hooks](#convert-to-hooks)
+  - [Refactoring Exercise: Code Sandbox](#refactoring-exercise-code-sandbox)
+    - [Refactor to Hooks](#refactor-to-hooks)
+    - [useEffect](#useeffect)
+  - [Exersize Cont.](#exersize-cont)
   - [Single Page Routing](#single-page-routing)
   - [Recipe Details](#recipe-details)
   - [ADDITIONS](#additions)
@@ -30,200 +31,6 @@ Using Code Sandbox, read and step through the [useState](https://reactjs.org/doc
 
 This project is a template for your final project which **must** include an Express API as well as a front end written in React.
 
-## Refactoring Exercise: Code Sandbox
-
-`https://codesandbox.io`
-
-`https://developer.github.com/v3/repos/#list-organization-repositories`
-
-`https://api.github.com/orgs/facebook/repos`
-
-```js
-import React from "react";
-import ReactDOM from "react-dom";
-
-import "./styles.css";
-
-class Github extends React.Component {
-  state = {
-    repos: []
-  };
-
-  render() {
-    return (
-      <div>
-        <h1>Repos</h1>
-        <ul>{/* list repos here */}</ul>
-      </div>
-    );
-  }
-}
-
-const rootElement = document.getElementById("root");
-ReactDOM.render(<Github />, rootElement);
-```
-
-Fetch the data:
-
-```js
-  componentDidMount(){
-    fetch('https://api.github.com/orgs/facebook/repos')
-    .then(res => res.json())
-    .then(json => this.setState({repos: json}))
-  }
-```
-
-Render the content:
-
-```js
-render() {
-    return (
-      <div>
-        <h1>Repos</h1>
-        <ul>
-          {this.state.repos.map( repo => (
-             <li key={repo.id}>{repo.full_name}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
-```
-
-Add a Loading flag:
-
-```js
-class Github extends React.Component {
-  state = {
-    loading: false,
-    repos: []
-  };
-
-  componentDidMount(){
-    this.setState({loading: true})
-    fetch('https://api.github.com/orgs/facebook/repos')
-    .then(res => res.json())
-    .then(json => this.setState({repos: json, loading: false}))
-    .catch( () => this.setState({loading: false}))
-  }
-
-  render() {
-    if(this.state.loading){
-      return <div>Loading repos...</div>
-    }
-    return (
-      <div>
-        <h1>Repos</h1>
-        <ul>
-          {this.state.repos.map( repo => (
-            <li key={repo.id}>{repo.full_name}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
-}
-```
-
-### Refactor to Hooks
-
-Import `useState` hook:
-
-`import React, {useState} from "react";`
-
-Create a new function under the class component:
-
-```js
-function GithubHooks(){
-const [loading, setLoading] = useState(false)
-const [repos, setRepos] = useState([])
-
-  if(loading){
-    return <div>Loading repos...</div>
-  }
-
-  return (
-    <div>
-      <h1>Repos</h1>
-      <ul>
-        {repos.map( repo => (
-          <li key={repo.id}>{repo.full_name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-```
-
-### useEffect
-
-Fetching the data.
-
-Import [useEffect](https://reactjs.org/docs/hooks-effect.html) hook:
-
-`import React, {useState, useEffect} from "react";`
-
-Set the data with useEffect:
-
-```js
-useEffect( () => {
-  setLoading(true)
-  fetch('https://api.github.com/orgs/facebook/repos')
-  .then(res => res.json())
-  .then(json => {
-    setLoading(false)
-    setRepos(json)
-  })
-  .catch(setLoading(false));
-}, [])
-```
-
-Render the component to the DOM:
-
-`ReactDOM.render(<GithubHooks />, rootElement);`
-
-Final component
-
-```js
-import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
-
-import "./styles.css";
-
-function GithubHooks() {
-  const [loading, setLoading] = useState(false);
-  const [repos, setRepos] = useState([]);
-
-  useEffect(() => {
-    setLoading(true);
-    fetch("https://api.github.com/orgs/facebook/repos")
-      .then(res => res.json())
-      .then(json => {
-        setLoading(false);
-        setRepos(json);
-      })
-      .catch(setLoading(false));
-  }, []);
-
-  if (loading) {
-    return <div>Loading repos...</div>;
-  }
-
-  return (
-    <div>
-      <h1>Repos</h1>
-      <ul>
-        {repos.map(repo => (
-          <li key={repo.id}>{repo.full_name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-const rootElement = document.getElementById("root");
-ReactDOM.render(<GithubHooks />, rootElement);
-```
 
 ## Exercise: React Front End
 
@@ -485,6 +292,203 @@ export default Recipe;
 
 ```
 
+## Refactoring Exercise: Code Sandbox
+
+`https://codesandbox.io`
+
+`https://developer.github.com/v3/repos/#list-organization-repositories`
+
+`https://api.github.com/orgs/facebook/repos`
+
+```js
+import React from "react";
+import ReactDOM from "react-dom";
+
+import "./styles.css";
+
+class Github extends React.Component {
+  state = {
+    repos: []
+  };
+
+  render() {
+    return (
+      <div>
+        <h1>Repos</h1>
+        <ul>{/* list repos here */}</ul>
+      </div>
+    );
+  }
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<Github />, rootElement);
+```
+
+Fetch the data:
+
+```js
+  componentDidMount(){
+    fetch('https://api.github.com/orgs/facebook/repos')
+    .then(res => res.json())
+    .then(json => this.setState({repos: json}))
+  }
+```
+
+Render the content:
+
+```js
+render() {
+    return (
+      <div>
+        <h1>Repos</h1>
+        <ul>
+          {this.state.repos.map( repo => (
+             <li key={repo.id}>{repo.full_name}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+```
+
+Add a Loading flag:
+
+```js
+class Github extends React.Component {
+  state = {
+    loading: false,
+    repos: []
+  };
+
+  componentDidMount(){
+    this.setState({loading: true})
+    fetch('https://api.github.com/orgs/facebook/repos')
+    .then(res => res.json())
+    .then(json => this.setState({repos: json, loading: false}))
+    .catch( () => this.setState({loading: false}))
+  }
+
+  render() {
+    if(this.state.loading){
+      return <div>Loading repos...</div>
+    }
+    return (
+      <div>
+        <h1>Repos</h1>
+        <ul>
+          {this.state.repos.map( repo => (
+            <li key={repo.id}>{repo.full_name}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+}
+```
+
+### Refactor to Hooks
+
+Import `useState` hook:
+
+`import React, {useState} from "react";`
+
+Create a new function under the class component:
+
+```js
+function GithubHooks(){
+const [loading, setLoading] = useState(false)
+const [repos, setRepos] = useState([])
+
+  if(loading){
+    return <div>Loading repos...</div>
+  }
+
+  return (
+    <div>
+      <h1>Repos</h1>
+      <ul>
+        {repos.map( repo => (
+          <li key={repo.id}>{repo.full_name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### useEffect
+
+Fetching the data.
+
+Import [useEffect](https://reactjs.org/docs/hooks-effect.html) hook:
+
+`import React, {useState, useEffect} from "react";`
+
+Set the data with useEffect:
+
+```js
+useEffect( () => {
+  setLoading(true)
+  fetch('https://api.github.com/orgs/facebook/repos')
+  .then(res => res.json())
+  .then(json => {
+    setLoading(false)
+    setRepos(json)
+  })
+  .catch(setLoading(false));
+}, [])
+```
+
+Render the component to the DOM:
+
+`ReactDOM.render(<GithubHooks />, rootElement);`
+
+Final component
+
+```js
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
+
+import "./styles.css";
+
+function GithubHooks() {
+  const [loading, setLoading] = useState(false);
+  const [repos, setRepos] = useState([]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("https://api.github.com/orgs/facebook/repos")
+      .then(res => res.json())
+      .then(json => {
+        setLoading(false);
+        setRepos(json);
+      })
+      .catch(setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <div>Loading repos...</div>;
+  }
+
+  return (
+    <div>
+      <h1>Repos</h1>
+      <ul>
+        {repos.map(repo => (
+          <li key={repo.id}>{repo.full_name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<GithubHooks />, rootElement);
+```
+
+## Exersize Cont.
+
 Then tackle the App component:
 
 ```js
@@ -517,48 +521,45 @@ export default App;
 
 ## Single Page Routing
 
+npm import [reach router](https://reach.tech/router) and import the router into App.
+
 `npm i @reach/router`
 
-npm import [reach router](https://reach.tech/router) and import the router into App:
-
 ```js
-import React from 'react';
-import { Router } from '@reach/router';
-import Recipes from './Recipes';
-import RecipeDetail from './RecipeDetail';
+import React, { useState, useEffect } from "react";
+import { Router } from "@reach/router";
+// import Recipe from "./Recipe";
+import Recipes from "./Recipes";
+import RecipeDetail from "./RecipeDetail";
+import "./index.css";
 
-class App extends React.Component {
-  state = {
-    recipes: []
-  };
+function App() {
+  const [recipes, setRecipes] = useState([]);
 
-  componentDidMount() {
-    fetch(`http://localhost:5000/api/recipes`)
+  useEffect(() => {
+    fetch(`/api/recipes`)
       .then(response => response.json())
-      .then(recipes =>
-        this.setState({
-          recipes: recipes
-        })
-      );
-  }
+      .then(json => {
+        setRecipes(json);
+      });
+  }, []);
 
-  render() {
-    return (
-      <div>
-        <h1>Recipes!</h1>
-        <Router>
-          <Recipes path='/' recipes={this.state.recipes} />
-          <RecipeDetail
+  return (
+    <div>
+      <h1>Recipes!</h1>
+      <Router>
+        <Recipes path="/" recipes={recipes} />
+        <RecipeDetail
           path="/recipe/:recipeId"
           recipe={recipes.filter(recipe => recipe._id === recipe.id)}
-          s/>
-        </Router>
-      </div>
-    );
-  }
+        />
+      </Router>
+    </div>
+  );
 }
 
 export default App;
+
 ```
 
 Create a Recipes component
@@ -584,7 +585,27 @@ class Recipes extends React.Component {
 export default Recipes;
 ```
 
-Edit the Recipe component:
+A new RecipeDetail component:
+
+```js
+import React from 'react';
+import { Link } from '@reach/router';
+
+class RecipeDetail extends React.Component {
+  render() {
+    const { recipeId } = this.props;
+    return (
+      <div>
+        <h1>{recipeId}</h1>
+      </div>
+    );
+  }
+}
+
+export default RecipeDetail;
+```
+
+Edit the Recipe component to link to a detail:
 
 ```js
 import React from "react";
@@ -630,25 +651,7 @@ export default Recipe;
 
 ```
 
-The Recipe items will link to a new RecipeDetail component:
 
-```js
-import React from 'react';
-import { Link } from '@reach/router';
-
-class RecipeDetail extends React.Component {
-  render() {
-    const { recipeId } = this.props;
-    return (
-      <div>
-        <h1>{recipeId}</h1>
-      </div>
-    );
-  }
-}
-
-export default RecipeDetail;
-```
 
 Edit the Recipe component to remove the details leaving only the description:
 
