@@ -15,8 +15,9 @@ Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/
   - [Refactoring Exercise: Code Sandbox](#refactoring-exercise-code-sandbox)
     - [Refactor to Hooks](#refactor-to-hooks)
     - [useEffect](#useeffect)
-  - [Exersize Cont.](#exersize-cont)
-  - [Single Page Routing](#single-page-routing)
+  - [Exercise Continued](#exercise-continued)
+  - [Client Side Routing](#client-side-routing)
+  - [fall2019-stop-here](#fall2019-stop-here)
   - [Recipe Details](#recipe-details)
   - [ADDITIONS](#additions)
   - [Adding a NavBar](#adding-a-navbar)
@@ -310,7 +311,7 @@ Copy the CSS from the vanillajs public folder into index.css.
 
 ## Convert to Hooks
 
-First practice converting from class to function with Recipe.js:
+First practice converting from class to function components by converting Recipe.js:
 
 ```js
 import React from "react";
@@ -354,9 +355,14 @@ export default Recipe;
 
 ## Refactoring Exercise: Code Sandbox
 
-`https://codesandbox.io`
+Go to `https://codesandbox.io` and create a new React sandbox.
+
+
+For this exercise we wil use the Github API. 
 
 `https://developer.github.com/v3/repos/#list-organization-repositories`
+
+To access Facebook's repos:
 
 `https://api.github.com/orgs/facebook/repos`
 
@@ -477,6 +483,10 @@ const [repos, setRepos] = useState([])
 }
 ```
 
+Coment out the class component and render the functional component to the DOM:
+
+`ReactDOM.render(<GithubHooks />, rootElement);`
+
 ### useEffect
 
 Fetching the data.
@@ -499,10 +509,6 @@ useEffect( () => {
   .catch(setLoading(false));
 }, [])
 ```
-
-Render the component to the DOM:
-
-`ReactDOM.render(<GithubHooks />, rootElement);`
 
 Final component
 
@@ -547,9 +553,9 @@ const rootElement = document.getElementById("root");
 ReactDOM.render(<GithubHooks />, rootElement);
 ```
 
-## Exersize Cont.
+## Exercise Continued
 
-Then tackle the App component:
+Convert the App component to a function:
 
 ```js
 import React, { useState, useEffect } from "react";
@@ -579,7 +585,55 @@ function App() {
 export default App;
 ```
 
-## Single Page Routing
+Create a Recipes component:
+
+```js
+import React from 'react';
+import Recipe from './Recipe';
+
+class Recipes extends React.Component {
+  render() {
+    const { recipes } = this.props;
+    console.log(recipes);
+    return (
+      <div>
+        {recipes.map(recipe => (
+          <Recipe key={recipe._id} recipe={recipe} />
+        ))}
+      </div>
+    );
+  }
+}
+
+export default Recipes;
+```
+
+And a new RecipeDetail component:
+
+```js
+import React from 'react';
+
+class RecipeDetail extends React.Component {
+  render() {
+    const { recipeId } = this.props;
+    return (
+      <div>
+        <h1>{recipeId}</h1>
+      </div>
+    );
+  }
+}
+
+export default RecipeDetail;
+```
+
+## Client Side Routing
+
+To begin exploring client side routing we'll use the Reach Router.
+
+Routing is the ability to move between different parts of an application when a user enters a URL or clicks an element (link, button, icon, image etc) within the application.
+
+Up until this point, you have dealt with simple projects that do not require transitioning from one view to another, thus, you are yet to interact with Routing in React.
 
 npm import [reach router](https://reach.tech/router) and import the router into App.
 
@@ -622,48 +676,7 @@ export default App;
 
 ```
 
-Create a Recipes component
-
-```js
-import React from 'react';
-import Recipe from './Recipe';
-
-class Recipes extends React.Component {
-  render() {
-    const { recipes } = this.props;
-    console.log(recipes);
-    return (
-      <div>
-        {recipes.map(recipe => (
-          <Recipe key={recipe._id} recipe={recipe} />
-        ))}
-      </div>
-    );
-  }
-}
-
-export default Recipes;
-```
-
-A new RecipeDetail component:
-
-```js
-import React from 'react';
-// import { Link } from '@reach/router';
-
-class RecipeDetail extends React.Component {
-  render() {
-    const { recipeId } = this.props;
-    return (
-      <div>
-        <h1>{recipeId}</h1>
-      </div>
-    );
-  }
-}
-
-export default RecipeDetail;
-```
+Note: probably the most common router for React is [React Router](https://reacttraining.com/react-router/)
 
 Edit the Recipe component to link to a detail leaving only the description:
 
@@ -698,6 +711,8 @@ class Recipe extends React.Component {
 
 export default Recipe;
 ```
+
+## fall2019-stop-here
 
 ## Recipe Details
 
