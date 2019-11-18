@@ -31,7 +31,7 @@ Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/
 
 ## Homework
 
-Convert any remaining class based components to functional components. Extend the RecipeDetail component to display ingredients and preparation details. (The notes below [this point](#fall2019-stop-here) may serve as a guide but the code samples assume a class component.)
+Convert any remaining class based components to functional components. Extend the RecipeDetail component to display ingredients and preparation details. (The notes below [this point](#fall2019-stop-here) may serve as a guide but the code samples assume a class component and have not been updated for hooks.)
 
 Note: your final project **must** include an Express API as well as a front end written in React. You can use the [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo as a starter for your api and the material below for the front end. 
 
