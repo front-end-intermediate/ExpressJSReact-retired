@@ -1,6 +1,6 @@
 # Express and React
 
-v 1.4
+Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo from Github.
 
 - [Express and React](#express-and-react)
   - [Homework](#homework)
@@ -8,7 +8,7 @@ v 1.4
   - [Own the Repo](#own-the-repo)
   - [Create a React project](#create-a-react-project)
   - [The First Component](#the-first-component)
-  - [CORS](#cors)
+  - [Aside: CORS](#aside-cors)
   - [Component Lifecycle](#component-lifecycle)
   - [Multiple Components](#multiple-components)
   - [Convert to Hooks](#convert-to-hooks)
@@ -34,7 +34,15 @@ This project is a template for your final project which **must** include an Expr
 
 ## Exercise: React Front End
 
-Download the heroku deploy and reconstitute the `.env` file:
+Clone the existing [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo from Github. 
+
+```sh
+cd <to your class projects directory>
+git clone https://github.com/front-end-intermediate/heroku-deploy.git
+cd <heroku-deploy>
+```
+
+In the [heroku-deploy](https://github.com/front-end-intermediate/heroku-deploy) reconstitute the `.env` file:
 
 ```js
 NODE_ENV=development
@@ -42,7 +50,15 @@ DATABASE=mongodb+srv://daniel:dd2345@recipes-3k4ea.mongodb.net/test?retryWrites=
 PORT=3000
 ```
 
-npm install and run to test.
+Go to [MongoDb](https://www.mongodb.com) and sign in. Find the CLuster you created and click on 'Connect' to get the connection string.
+
+Replace the database variable in `.env` with your own. Review the Database Access and Network Access settings. Check to ensure that your IP address settings are current or set to 'all.'
+
+npm install and run `npm run dev` to test. You should see the vanilla js site we contructed at port 300. Be sure to test the `/api/recipes` endpoint. 
+
+You might want to install a JSON formatter for you browser.
+
+[Chrome](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa) or use [Firefox Developer Edition](https://www.mozilla.org/en-US/firefox/developer/).
 
 ## Own the Repo
 
@@ -57,9 +73,11 @@ git push -u origin master
 
 ## Create a React project
 
-cd into the top level of the project directory and:
+cd into the top level of the project directory and run Create React App:
 
 `npx create-react-app client`
+
+cd into the client folder and remove the contents of the src folder and create an initial index.js file:
 
 ```sh
 $ cd client
@@ -85,7 +103,7 @@ Test the new page by cd'ing into the client and running `npm start`.
 
 We could run the client and server in a separate terminal tabs but we want an integrated application for deployment.
 
-cd into the top level of the project and Install [concurrently](https://www.npmjs.com/package/concurrently) as a dev dependency:
+cd into the top level of the project (`cd ..`) and Install [concurrently](https://www.npmjs.com/package/concurrently) as a dev dependency:
 
 `npm i -D concurrently`
 
@@ -96,17 +114,40 @@ Edit the package.json scripts:
 "dev": "concurrently \"npm run server\" \"npm run client\" --kill-others "
 ```
 
-Note: you'll need to set the old `dev` script to 'server'.
+Note: you'll need to set the old `dev` script to 'server':
 
-Since the React front end runs on port 3000 we'll change the PORT in `.env` and in server.js to 5000.
+```js
+"scripts": {
+  "start": "node server.js",
+  "server": "nodemon server.js",
+  "client": "npm start --prefix client",
+  "dev": "concurrently \"npm run server\" \"npm run client\" --kill-others "
+},
+```
 
-Set a Proxy in client package.json:
+Note: we are now maintaining two package.json files.
+
+Since the Create React App front end and the server _both_ run on port 3000 we'll change the PORT in `.env` and in server.js to 5000.
+
+In `.env`:
+
+```js
+NODE_ENV=development
+DATABASE=mongodb+srv://daniel:dd2345@recipes-3k4ea.mongodb.net/test?retryWrites=true&w=majority
+PORT=5000
+```
+
+In `server.js`:
+
+`const PORT = process.env.PORT || 5000;`
+
+Set a Proxy in the React client package.json:
 
 `"proxy": "http://localhost:5000"`
 
 cd into the root and run `npm run dev`.
 
-Note: any React specific npm installs need to be done in the client folder.
+_Important_: any React specific npm installs need to be done in the client folder.
 
 ## The First Component
 
@@ -140,9 +181,9 @@ class App extends React.Component {
 
 Load the front end to test. Make adjustments to index.js as needed.
 
-## CORS
+## Aside: CORS
 
-CORs. In `server.js`:
+I doubt we will need [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) in this exercise but in the event you need them in another application you would add the following to `server.js`:
 
 ```js
 app.use((req, res, next) => {
@@ -157,6 +198,8 @@ app.use((req, res, next) => {
 ```
 
 ## Component Lifecycle
+
+Fetch data from our API using ComponentDidMount and use a Recipe component to display them. 
 
 App.js:
 
@@ -200,9 +243,26 @@ class Recipe extends React.Component {
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
+Since we set a proxy for the front end we could use:
+
+```js
+fetch(`/api/recipes`)
+```
+
 ## Multiple Components
 
-Break the App and Recipe components into separate files.
+Exercise: Break the App and Recipe components into separate files such that index.js becomes:
+
+```js
+import React from "react";
+import ReactDOM from "react-dom";
+
+import App from "./components/App";
+
+ReactDOM.render(<App />, document.querySelector("#root"));
+```
+
+And renders the App component which, in tune, imports and renders the Recipe component.
 
 Scaffold the Recipe component.
 
