@@ -1,5 +1,7 @@
 # Express and React
 
+v 2.0
+
 Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo from Github.
 
 <!-- https://github.com/DannyBoyNYC/session-reactClient-expressServer -->
@@ -49,27 +51,11 @@ git clone https://github.com/front-end-intermediate/heroku-deploy.git
 cd <heroku-deploy>
 ```
 
-In the [heroku-deploy](https://github.com/front-end-intermediate/heroku-deploy) reconstitute the `.env` file:
-
-```js
-NODE_ENV=development
-DATABASE=mongodb+srv://daniel:dd2345@recipes-3k4ea.mongodb.net/test?retryWrites=true&w=majority
-PORT=3000
-```
-
-Go to [MongoDb](https://www.mongodb.com) and sign in. Find the CLuster you created and click on 'Connect' to get the connection string.
-
-Replace the database variable in `.env` with your own. Review the Database Access and Network Access settings. Check to ensure that your IP address settings are current or set to 'all.'
-
-npm install and run `npm run dev` to test. You should see the vanilla js site we contructed at port 300. Be sure to test the `/api/recipes` endpoint. 
-
-You might want to install a JSON formatter for you browser.
-
-[Chrome](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa) or use [Firefox Developer Edition](https://www.mozilla.org/en-US/firefox/developer/).
-
 ## Own the Repo
 
-Kill the server, check the current origin, remove the origin and add a new one:
+Create a new repo on your Github account. 
+
+Check the current origin, remove the origin and add a new one:
 
 ```sh
 git remote -v
@@ -78,7 +64,29 @@ git remote add origin <your-new-github-repo>
 git push -u origin master
 ```
 
-## Create a React project
+Demo: npm install and run dev.
+
+Reconstitute the `.env` file:
+
+```js
+NODE_ENV=development
+DATABASE=mongodb+srv://daniel:dd2345@recipes-3k4ea.mongodb.net/test?retryWrites=true&w=majority
+PORT=3000
+```
+
+Go to [MongoDb](https://www.mongodb.com) and sign in to your account. Find the Cluster you created for this project and click on 'Connect' to get the connection string.
+
+Replace the database variable in `.env` with your own. Also, review the Database Access and Network Access settings on MongoDb. Check to ensure that your IP address settings are current or set to 'all.'
+
+npm install and run `npm run dev` to test. You should see the vanilla js site we contructed at port 3000. Be sure to test the `/api/recipes` endpoint as well. 
+
+Note: you might want to install a JSON formatter for you browser.
+
+[Chrome](https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa) or use [Firefox Developer Edition](https://www.mozilla.org/en-US/firefox/developer/).
+
+## Create a React Project
+
+Kill the server if running.
 
 cd into the top level of the project directory and run Create React App:
 
@@ -121,7 +129,9 @@ Edit the package.json scripts:
 "dev": "concurrently \"npm run server\" \"npm run client\" --kill-others "
 ```
 
-Note: you'll need to set the old `dev` script to 'server':
+Note the `--prefix` option for the React client. This redirects the start command to our client folder.
+
+Note: you'll need to set the old `dev` script to 'server'. Here's the entire scripts portion of package.json.
 
 ```js
 "scripts": {
@@ -150,13 +160,17 @@ In `server.js`:
 
 Set a Proxy in the React client package.json:
 
-`"proxy": "http://localhost:5000"`
+`"proxy": "http://localhost:5000",`
 
 cd into the root and run `npm run dev`.
 
 _Important_: any React specific npm installs need to be done in the client folder.
 
+Test to make sure you can access both the React front end and the ExpressJS back end at their respective ports.
+
 ## The First Component
+
+In a new components directory.
 
 Create `components/App.js`:
 
@@ -186,11 +200,11 @@ class App extends React.Component {
 
 ```
 
-Load the front end to test. Make adjustments to index.js as needed.
+To test the new component make adjustments to index.js (import and render App) and App.js (export it as default and provide an empty index.css) as needed.
 
 ## Aside: CORS
 
-I doubt we will need [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) in this exercise but in the event you need them in another application you would add the following to `server.js`:
+I doubt we will need [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) in this exercise but in the event you need them in an application in the future you would add the following to `server.js`:
 
 ```js
 app.use((req, res, next) => {
@@ -212,7 +226,6 @@ App.js:
 
 ```js
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './index.css';
 
 class App extends React.Component {
@@ -221,7 +234,7 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    fetch(`http://localhost:5000/api/recipes`)
+    fetch(`/api/recipes`)
       .then(response => response.json())
       .then(recipes =>
         this.setState({
@@ -247,29 +260,39 @@ class Recipe extends React.Component {
   }
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+export default App;
 ```
 
-Since we set a proxy for the front end we could use:
+Since we set a proxy for the front end we can use:
 
 ```js
 fetch(`/api/recipes`)
 ```
 
+Instead of:
+
+```js
+fetch(`http://localhost:5000/api/recipes`)
+````
+
 ## Multiple Components
 
-Exercise: Break the App and Recipe components into separate files such that index.js becomes:
+Breakout the Recipe component into a separate file:
 
 ```js
 import React from "react";
-import ReactDOM from "react-dom";
 
-import App from "./components/App";
+class Recipe extends React.Component {
+  render() {
+    return <p>{this.props.recipe.title}</p>;
+  }
+}
 
-ReactDOM.render(<App />, document.querySelector("#root"));
-```
+export default Recipe;
 
-And renders the App component which, in tune, imports and renders the Recipe component.
+````
+
+The App component imports and renders the Recipe component.
 
 Scaffold the Recipe component.
 
@@ -323,6 +346,7 @@ First practice converting from class to function components by converting Recipe
 import React from "react";
 
 function Recipe(props) {
+
   const {
     title,
     name,
@@ -331,6 +355,7 @@ function Recipe(props) {
     ingredients,
     preparation
   } = props.recipe;
+
   return (
     <>
       <img
@@ -361,16 +386,24 @@ export default Recipe;
 
 ## Refactoring Exercise: Code Sandbox
 
-Go to `https://codesandbox.io` and create a new React sandbox.
+Go to `https://codesandbox.io` and use `File > New Sandbox` to create a new React sandbox.
 
-
-For this exercise we wil use the Github API. 
+For this short exercise we will use the Github API. 
 
 `https://developer.github.com/v3/repos/#list-organization-repositories`
 
-To access Facebook's repos:
+View your info on Github using your own username) e.g.:
+
+`https://api.github.com/users/DannyBoyNYC`
+
+Examine the info. To view your repos e.g.:
+
+`https://api.github.com/users/DannyBoyNYC/repos`
+
+We'll use Facebook's repos:
 
 `https://api.github.com/orgs/facebook/repos`
+
 
 ```js
 import React from "react";
@@ -400,12 +433,14 @@ ReactDOM.render(<Github />, rootElement);
 Fetch the data:
 
 ```js
-  componentDidMount(){
-    fetch('https://api.github.com/orgs/facebook/repos')
-    .then(res => res.json())
-    .then(json => this.setState({repos: json}))
-  }
+componentDidMount(){
+  fetch('https://api.github.com/orgs/facebook/repos')
+  .then(res => res.json())
+  .then(json => this.setState({repos: json}))
+}
 ```
+
+Note the React dev tools button at the bottom of the page.
 
 Render the content:
 
@@ -489,7 +524,7 @@ const [repos, setRepos] = useState([])
 }
 ```
 
-Coment out the class component and render the functional component to the DOM:
+Render the functional component to the DOM:
 
 `ReactDOM.render(<GithubHooks />, rootElement);`
 
@@ -571,7 +606,7 @@ function App() {
   const [recipes, setRecipes] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/recipes`)
+    fetch(`/api/recipes`)
       .then(response => response.json())
       .then(json => {
         setRecipes(json);
@@ -591,7 +626,7 @@ function App() {
 export default App;
 ```
 
-Create a Recipes component:
+In preparation for the next steps, create a new Recipes component:
 
 ```js
 import React from 'react';
@@ -639,11 +674,15 @@ To begin exploring client side routing we'll use the Reach Router.
 
 Routing is the ability to move between different parts of an application when a user enters a URL or clicks an element (link, button, icon, image etc) within the application.
 
-Up until this point, you have dealt with simple projects that do not require transitioning from one view to another, thus, you are yet to interact with Routing in React.
+Up until this point, you have dealt with simple projects that do not require transitioning from one view to another. You have yet to work with Routing in React.
 
 npm import [reach router](https://reach.tech/router) and import the router into App.
 
+_Note_: be sure you are cd'ed into the client directory before installing React related packages.
+
 `npm i @reach/router`
+
+Configure App.js for routing:
 
 ```js
 import React, { useState, useEffect } from "react";
@@ -682,6 +721,8 @@ export default App;
 
 ```
 
+Test by using a recipe `_id` at the route.
+
 Note: probably the most common router for React is [React Router](https://reacttraining.com/react-router/)
 
 Edit the Recipe component to link to a detail leaving only the description:
@@ -717,6 +758,8 @@ class Recipe extends React.Component {
 
 export default Recipe;
 ```
+
+Note the `Link` import.
 
 ## fall2019-stop-here
 
