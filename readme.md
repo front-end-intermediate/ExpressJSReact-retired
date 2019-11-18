@@ -2,8 +2,11 @@
 
 Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo from Github.
 
+<!-- https://github.com/DannyBoyNYC/session-reactClient-expressServer -->
+
 - [Express and React](#express-and-react)
   - [Homework](#homework)
+  - [Reading](#reading)
   - [Exercise: React Front End](#exercise-react-front-end)
   - [Own the Repo](#own-the-repo)
   - [Create a React project](#create-a-react-project)
@@ -28,10 +31,13 @@ Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/
 
 ## Homework
 
-Using Code Sandbox, read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect](https://reactjs.org/docs/hooks-effect.html) documentation.
+Convert any remaining class based components to functional components. Extend the RecipeDetail component to display ingredients and preparation details. (The notes below [this point](#fall2019-stop-here) may serve as a guide but the code samples assume a class component.)
 
-This project is a template for your final project which **must** include an Express API as well as a front end written in React.
+Note: your final project **must** include an Express API as well as a front end written in React. You can use the [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo as a starter for your api and the material below for the front end. 
 
+## Reading
+
+Read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect](https://reactjs.org/docs/hooks-effect.html) documentation. You may wish to use Code Sandbox to examine the code samples.
 
 ## Exercise: React Front End
 
