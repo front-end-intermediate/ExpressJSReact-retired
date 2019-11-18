@@ -589,7 +589,7 @@ A new RecipeDetail component:
 
 ```js
 import React from 'react';
-import { Link } from '@reach/router';
+// import { Link } from '@reach/router';
 
 class RecipeDetail extends React.Component {
   render() {
@@ -605,55 +605,7 @@ class RecipeDetail extends React.Component {
 export default RecipeDetail;
 ```
 
-Edit the Recipe component to link to a detail:
-
-```js
-import React from "react";
-import { Link } from "@reach/router";
-
-function Recipe(props) {
-  const {
-    _id,
-    title,
-    name,
-    description,
-    image,
-    ingredients,
-    preparation
-  } = props.recipe;
-  return (
-    <>
-      <img
-        src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${image}`}
-        alt={name}
-      />
-      <h3>
-        <Link to={`/recipe/${_id}`}>{title}</Link>
-      </h3>
-      <p>{description}</p>
-      <h4>Ingredients</h4>
-      <ul>
-        {ingredients.map(ingredient => (
-          <li key={ingredient}>{ingredient}</li>
-        ))}
-      </ul>
-      <h4>Preparation</h4>
-      <ul>
-        {preparation.map(prep => (
-          <li key={prep.step}>{prep.step}</li>
-        ))}
-      </ul>
-    </>
-  );
-}
-
-export default Recipe;
-
-```
-
-
-
-Edit the Recipe component to remove the details leaving only the description:
+Edit the Recipe component to link to a detail leaving only the description:
 
 ```js
 import React from 'react';
