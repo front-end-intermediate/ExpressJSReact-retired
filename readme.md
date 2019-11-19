@@ -1,6 +1,6 @@
 # Express and React
 
-v 2.0
+v 2.1
 
 Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo from Github.
 
@@ -11,7 +11,7 @@ Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/
   - [Reading](#reading)
   - [Exercise: React Front End](#exercise-react-front-end)
   - [Own the Repo](#own-the-repo)
-  - [Create a React project](#create-a-react-project)
+  - [Create a React Project](#create-a-react-project)
   - [The First Component](#the-first-component)
   - [Aside: CORS](#aside-cors)
   - [Component Lifecycle](#component-lifecycle)
@@ -22,9 +22,8 @@ Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/
     - [useEffect](#useeffect)
   - [Exercise Continued](#exercise-continued)
   - [Client Side Routing](#client-side-routing)
-  - [fall2019-stop-here](#fall2019-stop-here)
+  - [fall2019-start-here](#fall2019-start-here)
   - [Recipe Details](#recipe-details)
-  - [ADDITIONS](#additions)
   - [Adding a NavBar](#adding-a-navbar)
   - [Another State](#another-state)
   - [react-icons](#react-icons)
@@ -721,6 +720,8 @@ export default App;
 
 ```
 
+## fall2019-start-here
+
 Test by using a recipe `_id` at the route.
 
 Note: probably the most common router for React is [React Router](https://reacttraining.com/react-router/)
@@ -728,105 +729,109 @@ Note: probably the most common router for React is [React Router](https://reactt
 Edit the Recipe component to link to a detail leaving only the description:
 
 ```js
-import React from 'react';
-import { Link } from '@reach/router';
+import React from "react";
+import { Link } from "@reach/router";
 
-class Recipe extends React.Component {
-  render() {
-    const {
-      _id,
-      title,
-      description,
-      image,
-      ingredients,
-      preparation
-    } = this.props.recipe;
-    return (
-      <>
-        <img
-          src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${image}`}
-          alt={this.props.recipe.name}
-        />
-        <h3>
-          <Link to={`/recipe/${_id}`}>{title}</Link>
-        </h3>
-        <p>{description}</p>
-      </>
-    );
-  }
+function Recipe(props) {
+  const {
+    _id,
+    title,
+    description,
+    image,
+  } = props.recipe;
+
+  return (
+    <>
+      <img
+        src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${image}`}
+        alt={props.recipe.name}
+      />
+      <h3>
+        <Link to={`/recipe/${_id}`}>{title}</Link>
+      </h3>
+      <p>{description}</p>
+    </>
+  );
 }
 
 export default Recipe;
+
 ```
 
 Note the `Link` import.
 
-## fall2019-stop-here
-
 ## Recipe Details
+
+```js
+import React from "react";
+
+function RecipeDetail(props) {
+  const { recipeId } = props;
+  return (
+    <div>
+      <h1>{recipeId}</h1>
+    </div>
+  );
+}
+
+export default RecipeDetail;
+
+```
 
 Build out the RecipeDetail component:
 
 ```js
-import React from 'react';
-import { Link } from '@reach/router';
+import React, { useState, useEffect } from "react";
 
-class RecipeDetail extends React.Component {
-  state = {
-    recipe: {}
-  };
+function RecipeDetail(props) {
+  const recipeId = props.recipeId;
+  const currRecipe = props.recipes.filter(recipe => recipe._id === recipeId);
+  console.log(currRecipe[0]);
 
-  componentDidMount() {
-    fetch(`http://localhost:5000/api/recipes/${this.props.recipeId}`)
-      .then(response => response.json())
-      .then(recipe =>
-        this.setState({
-          recipe: recipe
-        })
-      );
-  }
-
-  render() {
-    const {
-      _id,
-      title,
-      description,
-      image,
-      ingredients,
-      preparation
-    } = this.state.recipe;
-    console.log(ingredients);
-    return (
-      <div>
-        <img
-          src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${image}`}
-          alt={title}
-        />
-        <h3>
-          <Link to={`/recipe/${_id}`}>{title}</Link>
-        </h3>
-        <p>{description}</p>
-        <h4>Ingredients</h4>
-        {ingredients}
-      </div>
-    );
-  }
+  return (
+    <>
+      {currRecipe.map(item => (
+        <div key={item._id}>
+          <img
+            src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${item.image}`}
+            alt={item.title}
+          />
+          <h1>{item.title}</h1>
+          <p>{item.description}</p>
+          <h3>Ingredients</h3>
+          <ul>
+            {item.ingredients.map(ingredient => (
+              <li key={ingredient}>{ingredient}</li>
+            ))}
+          </ul>
+          <h3>Preparation</h3>
+          <ul>
+            {item.preparation.map(prep => (
+              <li key={prep.step}>{prep.step}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </>
+  );
 }
 
 export default RecipeDetail;
+
 ```
 
+Add a back link to the details page:
+
+
 ```js
-return (
-  <div>
-    <pre>{JSON.stringify(this.state.recipe, null, 2)}</pre>
-  </div>
-);
+import { Link } from "@reach/router";
+...
+<Link to="/">Home</Link>
 ```
 
-To illustrate some issues with the buildout of RecipeDetail:
+<!-- To illustrate some issues with the buildout of RecipeDetail: -->
 
-```js
+<!-- ```js
 import React from 'react';
 
 class RecipeDetail extends React.Component {
@@ -881,11 +886,11 @@ class RecipeDetail extends React.Component {
 }
 
 export default RecipeDetail;
-```
+``` -->
 
-One solution:
+<!-- One solution: -->
 
-```js
+<!-- ```js
 import React from 'react';
 
 class RecipeDetail extends React.Component {
@@ -943,9 +948,9 @@ class RecipeDetail extends React.Component {
 }
 
 export default RecipeDetail;
-```
+``` -->
 
-## ADDITIONS
+<!-- ## ADDITIONS
 
 A graceful shutdown for ExpressJS:
 
@@ -962,7 +967,7 @@ function shutdown() {
 const server = app.listen(PORT, () =>
   console.log(`Server running at port ${PORT}`)
 );
-```
+``` -->
 
 Add a component to allow the centralization of maintenance functions.
 
@@ -990,7 +995,12 @@ class RecipeMaintenance extends Component {
 export default RecipeMaintenance;
 ```
 
-Import the component into App.js and add it to the routing scheme.
+Import the component into App.js:
+
+`import RecipeMaintenance from './RecipeMaintenance';`
+
+
+And add it to the routing scheme.
 
 ```js
 <Router>
@@ -1098,7 +1108,8 @@ class RecipeMaintenance extends Component {
       image: this.imageRef.current.value,
       description: this.descriptionRef.current.value
     };
-    this.props.addRecipe(recipe);
+    // this.props.addRecipe(recipe);
+    console.log(recipe);
   }
 
   render() {
@@ -1137,46 +1148,46 @@ export default RecipeMaintenance;
 Add the addRecipe function to App.js and send it as a prop to RecipeMaintenance:
 
 ```js
-import React from 'react';
-import Recipes from './Recipes';
-import RecipeDetails from './RecipeDetails';
-import RecipeMaintenance from './RecipeMaintenance';
+import React, { useState, useEffect } from "react";
+import { Router } from "@reach/router";
+import Recipes from "./Recipes";
+import RecipeDetail from "./RecipeDetail";
+import RecipeMaintenance from "./RecipeMaintenance";
+import "./index.css";
 
-import { Router } from '@reach/router';
+function App() {
+  const [recipes, setRecipes] = useState([]);
 
-class App extends React.Component {
-  state = {
-    recipes: []
-  };
-
-  componentDidMount() {
-    fetch(`http://localhost:5000/api/recipes`)
+  useEffect(() => {
+    fetch(`/api/recipes`)
       .then(response => response.json())
-      .then(recipes =>
-        this.setState({
-          recipes: recipes
-        })
-      );
-  }
+      .then(recipes => setRecipes(recipes));
+    // console.log("useEffect ran");
+  }, []);
 
-  addRecipe = recipe => {
-    console.log(recipe);
+  const addRecipe = recipe => {
+    console.log("from app ", recipe);
   };
 
-  render() {
-    return (
-      <div>
-        <Router>
-          <Recipes path='/' recipes={this.state.recipes} />
-          <RecipeDetails path='/recipe/:recipeId' />
-          <RecipeMaintenance path='/maintenance' addRecipe={this.addRecipe} />
-        </Router>
-      </div>
-    );
-  }
+  return (
+    <div>
+      <h1>Recipes!</h1>
+      {/* <pre>{JSON.stringify(recipes, null, 2)}</pre> */}
+      <Router>
+        <Recipes path="/" recipes={recipes} />
+        <RecipeDetail
+          path="/recipe/:recipeId"
+          recipes={recipes}
+          // recipe={recipes.filter(recipe => recipe._id === recipe.id)}
+        />
+        <RecipeMaintenance path="/maintenance" addRecipe={addRecipe} />
+      </Router>
+    </div>
+  );
 }
 
 export default App;
+
 ```
 
 Collect the state using a spread operator and log that to the console:
