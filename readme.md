@@ -1,8 +1,8 @@
 # Express and React
 
-v 2.1
+v 3.0
 
-Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo from Github.
+<!-- Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo from Github. -->
 
 <!-- https://github.com/DannyBoyNYC/session-reactClient-expressServer -->
 
@@ -23,7 +23,9 @@ Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/
   - [Exercise Continued](#exercise-continued)
   - [Client Side Routing](#client-side-routing)
   - [fall2019-start-here](#fall2019-start-here)
-  - [Recipe Details](#recipe-details)
+  - [Recipe Detail](#recipe-detail)
+  - [Adding a Recipe](#adding-a-recipe)
+  - [fall2019-stop-here](#fall2019-stop-here)
   - [Adding a NavBar](#adding-a-navbar)
   - [Another State](#another-state)
   - [react-icons](#react-icons)
@@ -32,7 +34,7 @@ Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/
 
 ## Homework
 
-Convert any remaining class based components to functional components. Extend the RecipeDetail component to display ingredients and preparation details. (The notes below [this point](#fall2019-stop-here) may serve as a guide but the code samples assume a class component and have not been updated for hooks.)
+<!-- Convert any remaining class based components to functional components. Extend the RecipeDetail component to display ingredients and preparation details. (The notes below [this point](#fall2019-stop-here) may serve as a guide but the code samples assume a class component and have not been updated for hooks.) -->
 
 Note: your final project **must** include an Express API as well as a front end written in React. You can use the [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo as a starter for your api and the material below for the front end. 
 
@@ -720,19 +722,23 @@ export default App;
 
 ```
 
+Test by using a recipe `_id` at the route.
+
+Note: probably the most common router for React is [React Router](https://reacttraining.com/react-router/)
+
 ## fall2019-start-here
 
-At the end of last class we had just implemented Routing.
+Note: at the end of last class we had just implemented Routing.
 
-If you are having difficulty running `npm run dev` you may wish to change the ports being used in:
+If you are having difficulty running `npm run dev` you may wish to increment the ports being used in:
 
 - .env
 - server.js
 - client/package.json (the proxy)
 
-Test by using a recipe `_id` at the route.
+If you are installing npm package be sure to install once in the top level of the project _and_ in the client folder.
 
-Note: probably the most common router for React is [React Router](https://reacttraining.com/react-router/)
+===
 
 Edit the Recipe component to link to a detail leaving only the description:
 
@@ -763,7 +769,7 @@ export default Recipe;
 
 Note the `Link` import from Reach router..
 
-## Recipe Details
+## Recipe Detail
 
 ```js
 import React from "react";
@@ -781,7 +787,13 @@ export default RecipeDetail;
 
 ```
 
-Build out the RecipeDetail component:
+We need to pass recipes as a props to RecipeDetail. Add them to the route in App:
+
+```js
+<RecipeDetail path="/recipe/:recipeId" recipes={recipes} />
+```
+
+Now that we have a recipes prop available in RecipeDetail we can build out the details themselves:
 
 ```js
 import React, { useState, useEffect } from "react";
@@ -823,7 +835,7 @@ export default RecipeDetail;
 
 ```
 
-Add a back link to the details page:
+Add a 'Home' link to the RecipeDetails:
 
 
 ```js
@@ -972,7 +984,9 @@ const server = app.listen(PORT, () =>
 );
 ``` -->
 
-Add a component to allow the centralization of maintenance functions.
+## Adding a Recipe
+
+We'll mimic a administration panel (which would normally be password protected etc.) with a maintenance component. Security through obscurity!
 
 RecipeMaintenance.js:
 
@@ -998,17 +1012,18 @@ class RecipeMaintenance extends Component {
 export default RecipeMaintenance;
 ```
 
+Note: this is a class component - for the time being.
+
 Import the component into App.js:
 
 `import RecipeMaintenance from './RecipeMaintenance';`
-
 
 And add it to the routing scheme.
 
 ```js
 <Router>
-  <Recipes path='/' recipes={this.state.recipes} />
-  <RecipeDetails path='/recipe/:recipeId' />
+  <Recipes path='/' recipes={recipes} />
+  <RecipeDetail path='/recipe/:recipeId' />
   <RecipeMaintenance path='/maintenance' />
 </Router>
 ```
@@ -1147,6 +1162,10 @@ class RecipeMaintenance extends Component {
 
 export default RecipeMaintenance;
 ```
+
+## fall2019-stop-here
+
+Review the last course section - [Hooks](https://github.com/front-end-intermediate/Hooks)
 
 Add the addRecipe function to App.js and send it as a prop to RecipeMaintenance:
 
