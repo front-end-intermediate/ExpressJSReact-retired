@@ -722,6 +722,14 @@ export default App;
 
 ## fall2019-start-here
 
+At the end of last class we had just implemented Routing.
+
+If you are having difficulty running `npm run dev` you may wish to change the ports being used in:
+
+- .env
+- server.js
+- client/package.json (the proxy)
+
 Test by using a recipe `_id` at the route.
 
 Note: probably the most common router for React is [React Router](https://reacttraining.com/react-router/)
@@ -733,12 +741,7 @@ import React from "react";
 import { Link } from "@reach/router";
 
 function Recipe(props) {
-  const {
-    _id,
-    title,
-    description,
-    image,
-  } = props.recipe;
+  const { _id, title, description, image } = props.recipe;
 
   return (
     <>
@@ -758,7 +761,7 @@ export default Recipe;
 
 ```
 
-Note the `Link` import.
+Note the `Link` import from Reach router..
 
 ## Recipe Details
 
