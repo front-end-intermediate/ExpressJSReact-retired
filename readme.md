@@ -1,10 +1,6 @@
 # Express and React
 
-v 3.0
-
-<!-- Nota Bene: Today you will clone the existing [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo from Github. -->
-
-<!-- https://github.com/DannyBoyNYC/session-reactClient-expressServer -->
+v 4.0
 
 - [Express and React](#express-and-react)
   - [Homework](#homework)
@@ -27,12 +23,11 @@ v 3.0
   - [Recipe Maintenance Function](#recipe-maintenance-function)
   - [Adding a NavBar](#adding-a-navbar)
   - [CSS in JS and React Icons](#css-in-js-and-react-icons)
+  - [Deployment](#deployment)
   - [Notes](#notes)
   - [Editing a Recipe](#editing-a-recipe)
 
 ## Homework
-
-<!-- Convert any remaining class based components to functional components. Extend the RecipeDetail component to display ingredients and preparation details. (The notes below [this point](#fall2019-stop-here) may serve as a guide but the code samples assume a class component and have not been updated for hooks.) -->
 
 Note: your final project **must** include an Express API as well as a front end written in React. You can use the [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo as a starter for your api and the material below for the front end.
 
@@ -1466,79 +1461,6 @@ And:
 
 `<ListRecipes recipes={props.recipes} deleteRecipe={props.deleteRecipe} />`
 
-<!-- ```js
-import React, { Component } from 'react';
-
-class ListRecipes extends Component {
-  handleDelete(id) {
-    fetch(`http://localhost:5000/api/recipes/${id}`, {
-      method: 'DELETE'
-    }).then(response => console.log(response));
-  }
-
-  render() {
-    return (
-      <ul>
-        {this.props.recipes.map(recipe => (
-          <li>
-            {recipe.title}{' '}
-            <button onClick={() => this.handleDelete(recipe._id)}>X</button>
-          </li>
-        ))}
-      </ul>
-    );
-  }
-}
-
-class RecipeMaintenance extends Component {
-  titleRef = React.createRef();
-  imageRef = React.createRef();
-  descriptionRef = React.createRef();
-
-  createRecipe(e) {
-    e.preventDefault();
-    const recipe = {
-      title: this.titleRef.current.value,
-      image: this.imageRef.current.value,
-      description: this.descriptionRef.current.value
-    };
-    this.props.addRecipe(recipe);
-  }
-
-  render() {
-    return (
-      <div>
-        <h3>Add Recipe Form</h3>
-        <form onSubmit={e => this.createRecipe(e)}>
-          <input
-            type='text'
-            name='title'
-            placeholder='Recipe name'
-            ref={this.titleRef}
-          />
-          <input
-            type='text'
-            name='image'
-            placeholder='Recipe image'
-            ref={this.imageRef}
-          />
-          <textarea
-            type='text'
-            name='description'
-            placeholder='Recipe description'
-            ref={this.descriptionRef}
-          />
-          <button type='submit'>Add Recipe</button>
-        </form>
-        <ListRecipes recipes={this.props.recipes} />
-      </div>
-    );
-  }
-}
-
-export default RecipeMaintenance;
-``` -->
-
 Be sure to pass the recipes to the component from App.js:
 
 ```js
@@ -1552,12 +1474,6 @@ Be sure to pass the recipes to the component from App.js:
   />
 </Router>
 ```
-
-<!-- ## Another State
-
-Lifting state up and the 'this' keyword.
-
-See [this](https://github.com/front-end-summer19/React-Intro#extending-classes) -->
 
 Create the deleteRecipe function in App:
 
@@ -1573,107 +1489,11 @@ const deleteRecipe = recipeToDelete => {
 };
 ```
 
-<!-- ```js
-import React from 'react';
-import Recipes from './Recipes';
-import RecipeDetails from './RecipeDetails';
-import RecipeMaintenance from './RecipeMaintenance';
-
-import { Router, Link } from '@reach/router';
-
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      recipes: []
-    };
-    this.handleDelete = this.handleDelete.bind(this);
-  }
-
-  componentDidMount() {
-    fetch(`http://localhost:5000/api/recipes`)
-      .then(response => response.json())
-      .then(recipes =>
-        this.setState({
-          recipes: recipes
-        })
-      );
-  }
-
-  addRecipe = recipe => {
-    console.log(recipe);
-    fetch(`http://localhost:5000/api/recipes`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(recipe)
-    })
-      .then(response => response.json())
-      .then(recipe => console.log(recipe));
-  };
-
-  handleDelete(id) {
-    console.log(this.state);
-    console.log(id);
-
-    fetch(`http://localhost:5000/api/recipes/${id}`, {
-      method: 'DELETE'
-    });
-    const recipes = [...this.state.recipes];
-    recipes.splice(id, 1);
-    this.setState({ recipes: recipes });
-  }
-
-  render() {
-    return (
-      <>
-        <nav>
-          <Link to='/'>Home</Link> <Link to='/maintenance'>Maintenance</Link>
-        </nav>
-        <Router>
-          <Recipes path='/' recipes={this.state.recipes} />
-          <RecipeDetails path='/recipe/:recipeId' />
-          <RecipeMaintenance
-            path='/maintenance'
-            addRecipe={this.addRecipe}
-            recipes={this.state.recipes}
-            handleDelete={this.handleDelete}
-          />
-        </Router>
-      </>
-    );
-  }
-}
-
-export default App;
-``` -->
-
 and
 
 ```js
 <ListRecipes recipes={props.recipes} deleteRecipe={props.deleteRecipe} />
 ```
-
-<!-- Update the addRecipe function in App.js:
-
-```js
-addRecipe = recipe => {
-  this.setState({ isLoading: true });
-  fetch(`http://localhost:5000/api/recipes`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(recipe)
-  })
-    .then(response => response.json())
-    .then(recipe => console.log(recipe));
-  const recipes = [...this.state.recipes];
-  recipes.unshift(recipe);
-  this.setState({ recipes: recipes, isLoading: false });
-};
-``` -->
 
 Test deleting a recipe.
 
@@ -1715,6 +1535,43 @@ Note the use of inline css.
 Try removing the border:
 
 `style={{ backgroundColor: 'transparent', border: 'none' }}`
+
+## Deployment
+
+We could run `npm run build` in the client folder and use that or use a Heroku postbuild script.
+
+In the script section of server's package.json add a script to:
+
+1. turn production mode off (you can't run npm build in the production environment)
+2. do an npm install and build (prefixing client)
+
+```js
+"heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+```
+
+`server.js` needs to be set up to serve the build.
+
+Make sure the following goes after _all_ the routes:
+
+```js
+if (process.env.NODE_ENV === 'production') {
+  // set static folder
+  app.use(express.static('client/build'));
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
+```
+
+The path.resolve has to have four arguments.
+
+Because we're using Node's built in path method be sure to require it (at the top of server.js):
+
+`const path = require('path');`
+
+And also... be sure to remove the old express.static middleware (it is now in the 'else' statement above).
+
+You can also add your database URI to `Config Vars` in the Heroku `Settings` for your project.
 
 ## Notes
 
