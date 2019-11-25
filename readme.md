@@ -21,7 +21,7 @@ v 4.0
   - [Recipe Detail](#recipe-detail)
   - [Adding a Recipe](#adding-a-recipe)
 - [fall2019-start-here](#fall2019-start-here)
-  - [Recipe Maintenance Function](#recipe-maintenance-function)
+  - [RecipeMaintenance Function](#recipemaintenance-function)
   - [Adding a NavBar](#adding-a-navbar)
   - [CSS in JS and React Icons](#css-in-js-and-react-icons)
   - [Deployment](#deployment)
@@ -1006,7 +1006,7 @@ export default RecipeMaintenance;
 
 # fall2019-start-here
 
-## Recipe Maintenance Function
+## RecipeMaintenance Function
 
 Convert the RecipeMaintenance component to a function:
 
@@ -1081,52 +1081,6 @@ const addRecipe = ({ name, image, description }) => {
 
 ```
 
-<!-- function component => =>  Collect the state using a spread operator and log that to the console:
-
-```js
-import React from 'react';
-import Recipes from './Recipes';
-import RecipeDetails from './RecipeDetails';
-import RecipeMaintenance from './RecipeMaintenance';
-
-import { Router } from '@reach/router';
-
-class App extends React.Component {
-  state = {
-    recipes: []
-  };
-
-  componentDidMount() {
-    fetch(`http://localhost:5000/api/recipes`)
-      .then(response => response.json())
-      .then(recipes =>
-        this.setState({
-          recipes: recipes
-        })
-      );
-  }
-
-  addRecipe = recipe => {
-    const recipes = [...this.state.recipes];
-    console.log(recipes);
-  };
-
-  render() {
-    return (
-      <div>
-        <Router>
-          <Recipes path='/' recipes={this.state.recipes} />
-          <RecipeDetails path='/recipe/:recipeId' />
-          <RecipeMaintenance path='/maintenance' addRecipe={this.addRecipe} />
-        </Router>
-      </div>
-    );
-  }
-}
-
-export default App;
-``` -->
-
 Expand the function to use our api. Note the fetch options:
 
 ```js
@@ -1169,21 +1123,6 @@ exports.add = function(req, res) {
 };
 ```
 
-<!-- ```js
-addRecipe = recipe => {
-  console.log(recipe);
-  fetch(`http://localhost:5000/api/recipes`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(recipe)
-  })
-    .then(response => response.json())
-    .then(recipe => console.log(recipe));
-};
-``` -->
-
 Test the form.
 
 Ooops, wrong name. Swap name for title:
@@ -1201,57 +1140,6 @@ const createRecipe = e => {
   props.addRecipe(recipe);
 };
 ```
-
-<!-- ```js
-import React, { Component } from 'react';
-
-class RecipeMaintenance extends Component {
-  titleRef = React.createRef();
-  imageRef = React.createRef();
-  descriptionRef = React.createRef();
-
-  createRecipe(e) {
-    e.preventDefault();
-    const recipe = {
-      title: this.titleRef.current.value,
-      image: this.imageRef.current.value,
-      description: this.descriptionRef.current.value
-    };
-    this.props.addRecipe(recipe);
-  }
-
-  render() {
-    return (
-      <div>
-        <h3>Add Recipe Form</h3>
-        <form onSubmit={e => this.createRecipe(e)}>
-          <input
-            type='text'
-            name='title'
-            placeholder='Recipe name'
-            ref={this.titleRef}
-          />
-          <input
-            type='text'
-            name='image'
-            placeholder='Recipe image'
-            ref={this.imageRef}
-          />
-          <textarea
-            type='text'
-            name='description'
-            placeholder='Recipe description'
-            ref={this.descriptionRef}
-          />
-          <button type='submit'>Add Recipe</button>
-        </form>
-      </div>
-    );
-  }
-}
-
-export default RecipeMaintenance;
-``` -->
 
 ## Adding a NavBar
 
@@ -1275,7 +1163,7 @@ render() {
   );
 ```
 
-Don't forget to import Link from reach router.
+Import Link from reach router.
 
 Create some css to support the new element:
 
@@ -1312,7 +1200,7 @@ function ListRecipes(props) {
       {props.recipes.map(recipe => (
         <li key={recipe._id}>
           {recipe.title}
-          <button onClick={() => props.deleteRecipe(recipe._id)}>X</button>
+          <button onClick={() => props.deleteRecipe(recipe)}>X</button>
         </li>
       ))}
     </ul>
@@ -1364,40 +1252,33 @@ Test deleting a recipe.
 
 `cd` into the client folder.
 
-`npm install react-icons` and `npm install emotion`
+`npm install react-icons emotion`
 
 use them in the maintenance interface:
 
 ```js
-import React, { Component } from 'react';
 import { FaTimesCircle } from 'react-icons/fa';
 
-class ListRecipes extends Component {
-  render() {
-    return (
-      <ul>
-        {this.props.recipes.map(recipe => (
-          <li key={recipe._id}>
-            {recipe.title}{' '}
-            <button
-              style={{ backgroundColor: 'transparent' }}
-              onClick={() => this.props.handleDelete(recipe._id)}
-            >
-              <FaTimesCircle color='rgb(194, 57, 42)' size={20} />
-            </button>
-          </li>
-        ))}
-      </ul>
-    );
-  }
+function ListRecipes(props) {
+  return (
+    <ul>
+      {props.recipes.map(recipe => (
+        <li key={recipe._id}>
+          {recipe.title}
+          <button
+            onClick={() => props.deleteRecipe(recipe)}
+            style={{ backgroundColor: 'transparent', border: 'none' }}
+          >
+            <FaTimesCircle color='rgb(194, 57, 42)' size={20} />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
 }
 ```
 
 Note the use of inline css.
-
-Try removing the border:
-
-`style={{ backgroundColor: 'transparent', border: 'none' }}`
 
 ## Deployment
 
