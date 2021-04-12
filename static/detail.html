@@ -8,13 +8,10 @@
     <title>Recipes!</title>
   </head>
   <body>
-    <header>
-      <h1>VanillaJS Recipes!</h1>
-    </header>
     <div id="root">
-      <br />
-      <h3>Create a New Recipe</h3>
-      <form action="/api/recipes" method="POST">
+      <h1>Recipes!</h1>
+      <h3>Edit Recipe</h3>
+      <form id="editForm">
         <input type="text" placeholder="Recipe Title" name="title" />
         <input type="text" placeholder="Image" name="image" />
         <textarea
@@ -22,13 +19,10 @@
           placeholder="Description"
           name="description"
         ></textarea>
-        <button type="submit">Submit</button>
+        <button>Update</button>
       </form>
+      <div class="recipe"></div>
     </div>
-
-    <script src="js/scripts.js"></script>
-    <script>
-      homepage();
-    </script>
+    <script src="js/details.js"></script>
   </body>
 </html>

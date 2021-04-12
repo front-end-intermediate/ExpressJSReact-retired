@@ -1,49 +1,22 @@
 # Express and React
 
-v 4.0
+v 5.0
 
-- [Express and React](#express-and-react)
-  - [Homework](#homework)
-  - [Reading](#reading)
-  - [Exercise: React Front End](#exercise-react-front-end)
-  - [Own the Repo](#own-the-repo)
-  - [Create a React Project](#create-a-react-project)
-  - [The First Component](#the-first-component)
-  - [Aside: CORS](#aside-cors)
-  - [Component Lifecycle](#component-lifecycle)
-  - [Multiple Components](#multiple-components)
-  - [Convert to Hooks](#convert-to-hooks)
-  - [Refactoring Exercise: Code Sandbox](#refactoring-exercise-code-sandbox)
-    - [Refactor to Hooks](#refactor-to-hooks)
-    - [useEffect](#useeffect)
-  - [Exercise Continued](#exercise-continued)
-  - [Client Side Routing](#client-side-routing)
-  - [Recipe Detail](#recipe-detail)
-  - [Adding a Recipe](#adding-a-recipe)
-- [fall2019-start-here](#fall2019-start-here)
-  - [RecipeMaintenance Function](#recipemaintenance-function)
-  - [Adding a NavBar](#adding-a-navbar)
-  - [CSS in JS and React Icons](#css-in-js-and-react-icons)
-  - [Deployment](#deployment)
-  - [Notes](#notes)
-  - [Editing a Recipe](#editing-a-recipe)
+<!-- ## Homework
 
-## Homework
+Note: your final project **must** include an Express API as well as a front end written in React. You can use the [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo as a starter for your api and the material below for the front end. -->
 
-Note: your final project **must** include an Express API as well as a front end written in React. You can use the [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo as a starter for your api and the material below for the front end.
+<!-- ## Reading
 
-## Reading
-
-Read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect](https://reactjs.org/docs/hooks-effect.html) documentation. You may wish to use Code Sandbox to examine the code samples.
+Read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect](https://reactjs.org/docs/hooks-effect.html) documentation. You may wish to use Code Sandbox to examine the code samples. -->
 
 ## Exercise: React Front End
 
-Clone the existing [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo from Github.
+Clone this repo from Github.
 
 ```sh
 cd <to your class projects directory>
-git clone https://github.com/front-end-intermediate/heroku-deploy.git
-cd <heroku-deploy>
+git clone <this-repo>
 ```
 
 ## Own the Repo
@@ -59,15 +32,15 @@ git remote add origin <your-new-github-repo>
 git push -u origin master
 ```
 
-Demo: npm install and run dev.
-
 Reconstitute the `.env` file:
 
 ```js
 NODE_ENV=development
-DATABASE=mongodb+srv://daniel:dd2345@recipes-3k4ea.mongodb.net/test?retryWrites=true&w=majority
+DATABASE=<your-connection-string>
 PORT=3000
 ```
+
+`DATABASE=mongodb+srv://daniel:dd2345@cluster0.3k4ea.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 
 Go to [MongoDb](https://www.mongodb.com) and sign in to your account. Find the Cluster you created for this project and click on 'Connect' to get the connection string.
 
@@ -98,14 +71,14 @@ $ touch src/index.js
 Create a simple start page in `index.js`:
 
 ```js
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 
 function HelloWorld() {
   return <div>Hello world</div>;
 }
 
-ReactDOM.render(<HelloWorld />, document.querySelector('#root'));
+ReactDOM.render(<HelloWorld />, document.querySelector("#root"));
 ```
 
 Test the new page by cd'ing into the client and running `npm start`.
@@ -169,18 +142,18 @@ In a new components directory.
 Create `components/App.js`:
 
 ```js
-import React from 'react';
-import './index.css';
+import React from "react";
+import "./index.css";
 
 class App extends React.Component {
   state = {
-    recipes: []
+    recipes: [],
   };
 
   componentDidMount() {
     fetch(`http://localhost:5000/api/recipes`)
-      .then(response => response.json())
-      .then(data => console.log(data));
+      .then((response) => response.json())
+      .then((data) => console.log(data));
   }
 
   render() {
@@ -201,12 +174,12 @@ I doubt we will need [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CO
 
 ```js
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  res.header("Access-Control-Allow-Origin", "*");
   res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
   );
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   next();
 });
 ```
@@ -218,20 +191,20 @@ Fetch data from our API using ComponentDidMount and use a Recipe component to di
 App.js:
 
 ```js
-import React from 'react';
-import './index.css';
+import React from "react";
+import "./index.css";
 
 class App extends React.Component {
   state = {
-    recipes: []
+    recipes: [],
   };
 
   componentDidMount() {
     fetch(`/api/recipes`)
-      .then(response => response.json())
-      .then(recipes =>
+      .then((response) => response.json())
+      .then((recipes) =>
         this.setState({
-          recipes: recipes
+          recipes: recipes,
         })
       );
   }
@@ -239,7 +212,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        {this.state.recipes.map(recipe => (
+        {this.state.recipes.map((recipe) => (
           <Recipe key={recipe._id} recipe={recipe} />
         ))}
       </div>
@@ -273,7 +246,7 @@ fetch(`http://localhost:5000/api/recipes`);
 Breakout the Recipe component into a separate file:
 
 ```js
-import React from 'react';
+import React from "react";
 
 class Recipe extends React.Component {
   render() {
@@ -289,7 +262,7 @@ The App component imports and renders the Recipe component.
 Scaffold the Recipe component.
 
 ```js
-import React from 'react';
+import React from "react";
 
 class Recipe extends React.Component {
   render() {
@@ -298,7 +271,7 @@ class Recipe extends React.Component {
       description,
       image,
       ingredients,
-      preparation
+      preparation,
     } = this.props.recipe;
     return (
       <>
@@ -310,13 +283,13 @@ class Recipe extends React.Component {
         <p>{description}</p>
         <h4>Ingredients</h4>
         <ul>
-          {ingredients.map(ingredient => (
+          {ingredients.map((ingredient) => (
             <li>{ingredient}</li>
           ))}
         </ul>
         <h4>Preparation</h4>
         <ul>
-          {preparation.map(prep => (
+          {preparation.map((prep) => (
             <li>{prep.step}</li>
           ))}
         </ul>
@@ -335,7 +308,7 @@ Copy the CSS from the vanillajs public folder into index.css.
 First practice converting from class to function components by converting Recipe.js:
 
 ```js
-import React from 'react';
+import React from "react";
 
 function Recipe(props) {
   const {
@@ -344,7 +317,7 @@ function Recipe(props) {
     description,
     image,
     ingredients,
-    preparation
+    preparation,
   } = props.recipe;
 
   return (
@@ -357,13 +330,13 @@ function Recipe(props) {
       <p>{description}</p>
       <h4>Ingredients</h4>
       <ul>
-        {ingredients.map(ingredient => (
+        {ingredients.map((ingredient) => (
           <li key={ingredient}>{ingredient}</li>
         ))}
       </ul>
       <h4>Preparation</h4>
       <ul>
-        {preparation.map(prep => (
+        {preparation.map((prep) => (
           <li key={prep.step}>{prep.step}</li>
         ))}
       </ul>
@@ -395,14 +368,14 @@ We'll use Facebook's repos:
 `https://api.github.com/orgs/facebook/repos`
 
 ```js
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 
-import './styles.css';
+import "./styles.css";
 
 class Github extends React.Component {
   state = {
-    repos: []
+    repos: [],
   };
 
   render() {
@@ -415,7 +388,7 @@ class Github extends React.Component {
   }
 }
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 ReactDOM.render(<Github />, rootElement);
 ```
 
@@ -454,14 +427,14 @@ Add a Loading flag:
 class Github extends React.Component {
   state = {
     loading: false,
-    repos: []
+    repos: [],
   };
 
   componentDidMount() {
     this.setState({ loading: true });
-    fetch('https://api.github.com/orgs/facebook/repos')
-      .then(res => res.json())
-      .then(json => this.setState({ repos: json, loading: false }))
+    fetch("https://api.github.com/orgs/facebook/repos")
+      .then((res) => res.json())
+      .then((json) => this.setState({ repos: json, loading: false }))
       .catch(() => this.setState({ loading: false }));
   }
 
@@ -473,7 +446,7 @@ class Github extends React.Component {
       <div>
         <h1>Repos</h1>
         <ul>
-          {this.state.repos.map(repo => (
+          {this.state.repos.map((repo) => (
             <li key={repo.id}>{repo.full_name}</li>
           ))}
         </ul>
@@ -504,7 +477,7 @@ function GithubHooks() {
     <div>
       <h1>Repos</h1>
       <ul>
-        {repos.map(repo => (
+        {repos.map((repo) => (
           <li key={repo.id}>{repo.full_name}</li>
         ))}
       </ul>
@@ -530,9 +503,9 @@ Set the data with useEffect:
 ```js
 useEffect(() => {
   setLoading(true);
-  fetch('https://api.github.com/orgs/facebook/repos')
-    .then(res => res.json())
-    .then(json => {
+  fetch("https://api.github.com/orgs/facebook/repos")
+    .then((res) => res.json())
+    .then((json) => {
       setLoading(false);
       setRepos(json);
     })
@@ -543,10 +516,10 @@ useEffect(() => {
 Final component
 
 ```js
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 
-import './styles.css';
+import "./styles.css";
 
 function GithubHooks() {
   const [loading, setLoading] = useState(false);
@@ -554,9 +527,9 @@ function GithubHooks() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('https://api.github.com/orgs/facebook/repos')
-      .then(res => res.json())
-      .then(json => {
+    fetch("https://api.github.com/orgs/facebook/repos")
+      .then((res) => res.json())
+      .then((json) => {
         setLoading(false);
         setRepos(json);
       })
@@ -571,7 +544,7 @@ function GithubHooks() {
     <div>
       <h1>Repos</h1>
       <ul>
-        {repos.map(repo => (
+        {repos.map((repo) => (
           <li key={repo.id}>{repo.full_name}</li>
         ))}
       </ul>
@@ -579,7 +552,7 @@ function GithubHooks() {
   );
 }
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 ReactDOM.render(<GithubHooks />, rootElement);
 ```
 
@@ -588,16 +561,16 @@ ReactDOM.render(<GithubHooks />, rootElement);
 Convert the App component to a function:
 
 ```js
-import React, { useState, useEffect } from 'react';
-import Recipe from './Recipe';
+import React, { useState, useEffect } from "react";
+import Recipe from "./Recipe";
 
 function App() {
   const [recipes, setRecipes] = useState([]);
 
   useEffect(() => {
     fetch(`/api/recipes`)
-      .then(response => response.json())
-      .then(json => {
+      .then((response) => response.json())
+      .then((json) => {
         setRecipes(json);
       });
   });
@@ -605,7 +578,7 @@ function App() {
   return (
     <div>
       {/* <pre>{JSON.stringify(this.state.recipes, null, 2)}</pre> */}
-      {recipes.map(recipe => (
+      {recipes.map((recipe) => (
         <Recipe key={recipe._id} recipe={recipe} />
       ))}
     </div>
@@ -618,8 +591,8 @@ export default App;
 In preparation for the next steps, create a new Recipes component:
 
 ```js
-import React from 'react';
-import Recipe from './Recipe';
+import React from "react";
+import Recipe from "./Recipe";
 
 class Recipes extends React.Component {
   render() {
@@ -627,7 +600,7 @@ class Recipes extends React.Component {
     console.log(recipes);
     return (
       <div>
-        {recipes.map(recipe => (
+        {recipes.map((recipe) => (
           <Recipe key={recipe._id} recipe={recipe} />
         ))}
       </div>
@@ -641,7 +614,7 @@ export default Recipes;
 And a new RecipeDetail component:
 
 ```js
-import React from 'react';
+import React from "react";
 
 class RecipeDetail extends React.Component {
   render() {
@@ -674,20 +647,20 @@ _Note_: be sure you are cd'ed into the client directory before installing React 
 Configure App.js for routing:
 
 ```js
-import React, { useState, useEffect } from 'react';
-import { Router } from '@reach/router';
+import React, { useState, useEffect } from "react";
+import { Router } from "@reach/router";
 // import Recipe from "./Recipe";
-import Recipes from './Recipes';
-import RecipeDetail from './RecipeDetail';
-import './index.css';
+import Recipes from "./Recipes";
+import RecipeDetail from "./RecipeDetail";
+import "./index.css";
 
 function App() {
   const [recipes, setRecipes] = useState([]);
 
   useEffect(() => {
     fetch(`/api/recipes`)
-      .then(response => response.json())
-      .then(json => {
+      .then((response) => response.json())
+      .then((json) => {
         setRecipes(json);
       });
   }, []);
@@ -696,10 +669,10 @@ function App() {
     <div>
       <h1>Recipes!</h1>
       <Router>
-        <Recipes path='/' recipes={recipes} />
+        <Recipes path="/" recipes={recipes} />
         <RecipeDetail
-          path='/recipe/:recipeId'
-          recipe={recipes.filter(recipe => recipe._id === recipe.id)}
+          path="/recipe/:recipeId"
+          recipe={recipes.filter((recipe) => recipe._id === recipe.id)}
         />
       </Router>
     </div>
@@ -728,8 +701,8 @@ If you are installing npm package be sure to install once in the top level of th
 Edit the Recipe component to link to a detail leaving only the description:
 
 ```js
-import React from 'react';
-import { Link } from '@reach/router';
+import React from "react";
+import { Link } from "@reach/router";
 
 function Recipe(props) {
   const { _id, title, description, image } = props.recipe;
@@ -756,7 +729,7 @@ Note the `Link` import from Reach router..
 ## Recipe Detail
 
 ```js
-import React from 'react';
+import React from "react";
 
 function RecipeDetail(props) {
   const { recipeId } = props;
@@ -773,22 +746,22 @@ export default RecipeDetail;
 We need to pass recipes as a props to RecipeDetail. Add them to the route in App:
 
 ```js
-<RecipeDetail path='/recipe/:recipeId' recipes={recipes} />
+<RecipeDetail path="/recipe/:recipeId" recipes={recipes} />
 ```
 
 Now that we have a recipes prop available in RecipeDetail we can build out the details themselves:
 
 ```js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 function RecipeDetail(props) {
   const recipeId = props.recipeId;
-  const currRecipe = props.recipes.filter(recipe => recipe._id === recipeId);
+  const currRecipe = props.recipes.filter((recipe) => recipe._id === recipeId);
   console.log(currRecipe[0]);
 
   return (
     <>
-      {currRecipe.map(item => (
+      {currRecipe.map((item) => (
         <div key={item._id}>
           <img
             src={`http://oit2.scps.nyu.edu/~devereld/intermediate/img/${item.image}`}
@@ -798,13 +771,13 @@ function RecipeDetail(props) {
           <p>{item.description}</p>
           <h3>Ingredients</h3>
           <ul>
-            {item.ingredients.map(ingredient => (
+            {item.ingredients.map((ingredient) => (
               <li key={ingredient}>{ingredient}</li>
             ))}
           </ul>
           <h3>Preparation</h3>
           <ul>
-            {item.preparation.map(prep => (
+            {item.preparation.map((prep) => (
               <li key={prep.step}>{prep.step}</li>
             ))}
           </ul>
@@ -832,7 +805,7 @@ We'll mimic a administration panel (which would normally be password protected e
 RecipeMaintenance.js:
 
 ```js
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 class RecipeMaintenance extends Component {
   render() {
@@ -840,10 +813,10 @@ class RecipeMaintenance extends Component {
       <div>
         <h3>Add Recipe Form</h3>
         <form>
-          <input type='text' placeholder='Recipe name' />
-          <input type='text' placeholder='Recipe image' />
-          <textarea type='text' placeholder='Recipe description' />
-          <button type='submit'>Add Recipe</button>
+          <input type="text" placeholder="Recipe name" />
+          <input type="text" placeholder="Recipe image" />
+          <textarea type="text" placeholder="Recipe description" />
+          <button type="submit">Add Recipe</button>
         </form>
       </div>
     );
@@ -863,9 +836,9 @@ And add it to the routing scheme.
 
 ```js
 <Router>
-  <Recipes path='/' recipes={recipes} />
-  <RecipeDetail path='/recipe/:recipeId' />
-  <RecipeMaintenance path='/maintenance' />
+  <Recipes path="/" recipes={recipes} />
+  <RecipeDetail path="/recipe/:recipeId" />
+  <RecipeMaintenance path="/maintenance" />
 </Router>
 ```
 
@@ -874,23 +847,23 @@ Test the path in the browser.
 Add onSubmit and createRecipe:
 
 ```js
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 class RecipeMaintenance extends Component {
   createRecipe(e) {
     e.preventDefault();
-    console.log('making a recipe');
+    console.log("making a recipe");
   }
 
   render() {
     return (
       <div>
         <h3>Add Recipe Form</h3>
-        <form onSubmit={e => this.createRecipe(e)}>
-          <input type='text' placeholder='Recipe name' />
-          <input type='text' placeholder='Recipe image' />
-          <textarea type='text' placeholder='Recipe description' />
-          <button type='submit'>Add Recipe</button>
+        <form onSubmit={(e) => this.createRecipe(e)}>
+          <input type="text" placeholder="Recipe name" />
+          <input type="text" placeholder="Recipe image" />
+          <textarea type="text" placeholder="Recipe description" />
+          <button type="submit">Add Recipe</button>
         </form>
       </div>
     );
@@ -905,7 +878,7 @@ Test the button.
 Outfit the form with refs:
 
 ```js
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 class RecipeMaintenance extends Component {
   nameRef = React.createRef();
@@ -914,33 +887,33 @@ class RecipeMaintenance extends Component {
 
   createRecipe(e) {
     e.preventDefault();
-    console.log('making a recipe');
+    console.log("making a recipe");
   }
 
   render() {
     return (
       <div>
         <h3>Add Recipe Form</h3>
-        <form onSubmit={e => this.createRecipe(e)}>
+        <form onSubmit={(e) => this.createRecipe(e)}>
           <input
-            type='text'
-            name='name'
-            placeholder='Recipe name'
+            type="text"
+            name="name"
+            placeholder="Recipe name"
             ref={this.nameRef}
           />
           <input
-            type='text'
-            name='image'
-            placeholder='Recipe image'
+            type="text"
+            name="image"
+            placeholder="Recipe image"
             ref={this.imageRef}
           />
           <textarea
-            type='text'
-            name='description'
-            placeholder='Recipe description'
+            type="text"
+            name="description"
+            placeholder="Recipe description"
             ref={this.descriptionRef}
           />
-          <button type='submit'>Add Recipe</button>
+          <button type="submit">Add Recipe</button>
         </form>
       </div>
     );
@@ -953,7 +926,7 @@ export default RecipeMaintenance;
 Complete the createRecipe function:
 
 ```js
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 class RecipeMaintenance extends Component {
   nameRef = React.createRef();
@@ -965,7 +938,7 @@ class RecipeMaintenance extends Component {
     const recipe = {
       name: this.nameRef.current.value,
       image: this.imageRef.current.value,
-      description: this.descriptionRef.current.value
+      description: this.descriptionRef.current.value,
     };
     // this.props.addRecipe(recipe);
     console.log(recipe);
@@ -975,26 +948,26 @@ class RecipeMaintenance extends Component {
     return (
       <div>
         <h3>Add Recipe Form</h3>
-        <form onSubmit={e => this.createRecipe(e)}>
+        <form onSubmit={(e) => this.createRecipe(e)}>
           <input
-            type='text'
-            name='name'
-            placeholder='Recipe name'
+            type="text"
+            name="name"
+            placeholder="Recipe name"
             ref={this.nameRef}
           />
           <input
-            type='text'
-            name='image'
-            placeholder='Recipe image'
+            type="text"
+            name="image"
+            placeholder="Recipe image"
             ref={this.imageRef}
           />
           <textarea
-            type='text'
-            name='description'
-            placeholder='Recipe description'
+            type="text"
+            name="description"
+            placeholder="Recipe description"
             ref={this.descriptionRef}
           />
-          <button type='submit'>Add Recipe</button>
+          <button type="submit">Add Recipe</button>
         </form>
       </div>
     );
@@ -1011,19 +984,19 @@ export default RecipeMaintenance;
 Convert the RecipeMaintenance component to a function:
 
 ```js
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 
 function RecipeMaintenance(props) {
   const nameRef = useRef();
   const imageRef = useRef();
   const descriptionRef = useRef();
 
-  const createRecipe = e => {
+  const createRecipe = (e) => {
     e.preventDefault();
     const recipe = {
       name: nameRef.current.value,
       image: imageRef.current.value,
-      description: descriptionRef.current.value
+      description: descriptionRef.current.value,
     };
     props.addRecipe(recipe);
   };
@@ -1031,26 +1004,26 @@ function RecipeMaintenance(props) {
   return (
     <div>
       <h3>Add Recipe Form</h3>
-      <form onSubmit={e => createRecipe(e)}>
+      <form onSubmit={(e) => createRecipe(e)}>
         <input
-          type='text'
-          name='name'
-          placeholder='Recipe name'
+          type="text"
+          name="name"
+          placeholder="Recipe name"
           ref={nameRef}
         />
         <input
-          type='text'
-          name='image'
-          placeholder='Recipe image'
+          type="text"
+          name="image"
+          placeholder="Recipe image"
           ref={imageRef}
         />
         <textarea
-          type='text'
-          name='description'
-          placeholder='Recipe description'
+          type="text"
+          name="description"
+          placeholder="Recipe description"
           ref={descriptionRef}
         />
-        <button type='submit'>Add Recipe</button>
+        <button type="submit">Add Recipe</button>
       </form>
     </div>
   );
@@ -1084,29 +1057,29 @@ const addRecipe = ({ name, image, description }) => {
 Expand the function to use our api. Note the fetch options:
 
 ```js
-const addRecipe = recipe => {
+const addRecipe = (recipe) => {
   fetch(`/api/recipes`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(recipe)
+    body: JSON.stringify(recipe),
   })
-    .then(res => {
+    .then((res) => {
       if (res.ok) {
         return res;
       }
-      throw new Error('Could not create a recipe');
+      throw new Error("Could not create a recipe");
     })
-    .then(res => res.json())
-    .then(recipe =>
+    .then((res) => res.json())
+    .then((recipe) =>
       setRecipes([
         ...recipes,
         {
           name: recipe.name,
           image: recipe.image,
-          description: recipe.description
-        }
+          description: recipe.description,
+        },
       ])
     );
 };
@@ -1115,8 +1088,8 @@ const addRecipe = recipe => {
 recipe.controllers:
 
 ```js
-exports.add = function(req, res) {
-  Recipe.create(req.body, function(err, json) {
+exports.add = function (req, res) {
+  Recipe.create(req.body, function (err, json) {
     if (err) return res.send(err);
     return res.send(json);
   });
@@ -1130,12 +1103,12 @@ Ooops, wrong name. Swap name for title:
 RecipeMaintenance:
 
 ```js
-const createRecipe = e => {
+const createRecipe = (e) => {
   e.preventDefault();
   const recipe = {
     title: nameRef.current.value,
     image: imageRef.current.value,
-    description: descriptionRef.current.value
+    description: descriptionRef.current.value,
   };
   props.addRecipe(recipe);
 };
@@ -1187,7 +1160,7 @@ Add a link to Maintenance:
 
 ```js
 <nav>
-  <Link to='/'>Home</Link> <Link to='/maintenance'>Maintenance</Link>
+  <Link to="/">Home</Link> <Link to="/maintenance">Maintenance</Link>
 </nav>
 ```
 
@@ -1197,7 +1170,7 @@ Adding delete to RecipeMaintenance:
 function ListRecipes(props) {
   return (
     <ul>
-      {props.recipes.map(recipe => (
+      {props.recipes.map((recipe) => (
         <li key={recipe._id}>
           {recipe.title}
           <button onClick={() => props.deleteRecipe(recipe)}>X</button>
@@ -1216,10 +1189,10 @@ Be sure to pass the recipes to the component from App.js:
 
 ```js
 <Router>
-  <Recipes path='/' recipes={recipes} />
-  <RecipeDetail path='/recipe/:recipeId' recipes={recipes} />
+  <Recipes path="/" recipes={recipes} />
+  <RecipeDetail path="/recipe/:recipeId" recipes={recipes} />
   <RecipeMaintenance
-    path='/maintenance'
+    path="/maintenance"
     addRecipe={addRecipe}
     recipes={recipes}
   />
@@ -1229,12 +1202,12 @@ Be sure to pass the recipes to the component from App.js:
 Create the deleteRecipe function in App:
 
 ```js
-const deleteRecipe = recipeToDelete => {
+const deleteRecipe = (recipeToDelete) => {
   fetch(`/api/recipes/${recipeToDelete._id}`, {
-    method: 'DELETE'
-  }).then(res => {
-    setRecipes(recipes =>
-      recipes.filter(recipe => recipe._id !== recipeToDelete._id)
+    method: "DELETE",
+  }).then((res) => {
+    setRecipes((recipes) =>
+      recipes.filter((recipe) => recipe._id !== recipeToDelete._id)
     );
   });
 };
@@ -1257,19 +1230,19 @@ Test deleting a recipe.
 use them in the maintenance interface:
 
 ```js
-import { FaTimesCircle } from 'react-icons/fa';
+import { FaTimesCircle } from "react-icons/fa";
 
 function ListRecipes(props) {
   return (
     <ul>
-      {props.recipes.map(recipe => (
+      {props.recipes.map((recipe) => (
         <li key={recipe._id}>
           {recipe.title}
           <button
             onClick={() => props.deleteRecipe(recipe)}
-            style={{ backgroundColor: 'transparent', border: 'none' }}
+            style={{ backgroundColor: "transparent", border: "none" }}
           >
-            <FaTimesCircle color='rgb(194, 57, 42)' size={20} />
+            <FaTimesCircle color="rgb(194, 57, 42)" size={20} />
           </button>
         </li>
       ))}
@@ -1298,11 +1271,11 @@ In the script section of server's package.json add a script to:
 Make sure the following goes after _all_ the routes:
 
 ```js
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   // set static folder
-  app.use(express.static('client/build'));
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  app.use(express.static("client/build"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }
 ```
@@ -1324,22 +1297,22 @@ You can also add your database URI to `Config Vars` in the Heroku `Settings` for
 EditRecipe.js:
 
 ```js
-import React from 'react';
+import React from "react";
 
 class EditRecipe extends React.Component {
   state = {
     recipe: [],
-    isLoading: false
+    isLoading: false,
   };
 
   componentDidMount() {
     this.setState({ isLoading: true });
     fetch(`http://localhost:5000/api/recipes/${this.props.recipeid}`)
-      .then(response => response.json())
-      .then(recipe =>
+      .then((response) => response.json())
+      .then((recipe) =>
         this.setState({
           recipe: recipe,
-          isLoading: false
+          isLoading: false,
         })
       );
   }
@@ -1364,14 +1337,14 @@ class ListRecipes extends Component {
   render() {
     return (
       <ul>
-        {this.props.recipes.map(recipe => (
+        {this.props.recipes.map((recipe) => (
           <li key={recipe._id}>
-            <Link to={`/editrecipe/${recipe._id}`}>{recipe.title}</Link>{' '}
+            <Link to={`/editrecipe/${recipe._id}`}>{recipe.title}</Link>{" "}
             <button
-              style={{ backgroundColor: 'transparent', border: 'none' }}
+              style={{ backgroundColor: "transparent", border: "none" }}
               onClick={() => this.props.handleDelete(recipe._id)}
             >
-              <FaTimesCircle color='rgb(194, 57, 42)' size={20} />
+              <FaTimesCircle color="rgb(194, 57, 42)" size={20} />
             </button>
           </li>
         ))}
@@ -1384,22 +1357,22 @@ class ListRecipes extends Component {
 Expand edit form:
 
 ```js
-import React from 'react';
+import React from "react";
 
 class EditRecipe extends React.Component {
   state = {
     recipe: [],
-    isLoading: false
+    isLoading: false,
   };
 
   componentDidMount() {
     this.setState({ isLoading: true });
     fetch(`http://localhost:5000/api/recipes/${this.props.recipeId}`)
-      .then(response => response.json())
-      .then(recipe =>
+      .then((response) => response.json())
+      .then((recipe) =>
         this.setState({
           recipe: recipe,
-          isLoading: false
+          isLoading: false,
         })
       );
   }
@@ -1414,21 +1387,21 @@ class EditRecipe extends React.Component {
         <h3>EDIT RECIPE</h3>
         <form onSubmit={this.handleSubmit}>
           <input
-            type='text'
-            placeholder='Recipe Title'
-            name='title'
+            type="text"
+            placeholder="Recipe Title"
+            name="title"
             value={this.state.recipe.title}
           />
           <input
-            type='text'
-            placeholder='Image'
-            name='image'
+            type="text"
+            placeholder="Image"
+            name="image"
             value={this.state.recipe.image}
           />
           <textarea
-            type='text'
-            placeholder='Description'
-            name='description'
+            type="text"
+            placeholder="Description"
+            name="description"
             value={this.state.recipe.description}
           />
           <button>Update</button>
