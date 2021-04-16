@@ -10,6 +10,15 @@ const app = express();
 
 const dataBaseURL = process.env.DATABASE || "mongodb://localhost:27017";
 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+  next();
+});
 app.use(express.static("static"));
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: false }));
@@ -28,7 +37,7 @@ app.get("/api/import", recipeControllers.import);
 app.get("/api/killall", recipeControllers.killall);
 app.post("/api/upload", recipeControllers.upload);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 mongoose
   .connect(dataBaseURL, { useNewUrlParser: true, useUnifiedTopology: true })
