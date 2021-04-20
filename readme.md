@@ -1,11 +1,5 @@
 # Express and React
 
-v 5.0
-
-<!-- ## Homework
-
-Note: your final project **must** include an Express API as well as a front end written in React. You can use the [Heroku Deploy](https://github.com/front-end-intermediate/heroku-deploy) repo as a starter for your api and the material below for the front end. -->
-
 ## Reading
 
 Read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect](https://reactjs.org/docs/hooks-effect.html) documentation. You may wish to use Code Sandbox to examine the code samples.
@@ -2182,7 +2176,11 @@ const total = nums.reduce(reducer);
 console.log("total", total);
 ```
 
+## useReducer
+
 React comes with a built-in Hook called useReducer that allows you to add state to a function component but manage that state using the reducer pattern.
+
+`useState` and `useReducer` both allow you to add state to function components. `useReducer` offers a bit more flexibility since it allows you to decouple how the state is updated from the action that triggered the update - typically leading to more declarative state updates.
 
 `useReducer` returns an array with the first element being the state and the second element being a dispatch function which when called, will invoke the reducer.
 
@@ -2565,7 +2563,37 @@ div.lit {
 }
 ```
 
+## Context
+
+Context provides a way to pass data through the component tree without having to pass props down manually at every level. - The React Docs
+
 ## Instructor Notes
+
+## Storing
+
+`const [theme, setTheme] = useLocalStorage('theme', 'light');`
+
+```js
+import * as React from "react";
+
+export const useLocalStorage = (key, defaultVal) => {
+  const [state, setState] = React.useState(() => {
+    let val;
+    try {
+      val = JSON.parse(window.localStorage.getItem(key) || String(defaultVal));
+    } catch (err) {
+      val = defaultVal;
+    }
+    return val;
+  });
+
+  React.useEffect(() => {
+    window.localStorage.setItem(key, JSON.stringify(state));
+  }, [state, key]);
+
+  return [state, setState];
+};
+```
 
 Convert the maintenance screen to a functional component with state:
 
@@ -2868,7 +2896,7 @@ class EditRecipe extends React.Component {
             type="text"
             placeholder="Description"
             name="description"
-            value={this.state.recipe.description}
+`            value={this.state.recipe.description}
           />
           <button>Update</button>
         </form>
