@@ -574,7 +574,9 @@ function App() {
 export default App;
 ``` -->
 
-In preparation for the next steps, create a new Recipes component:
+In preparation for the next steps, create two new componetns.
+
+A Recipes component:
 
 ```js
 import React from "react";
@@ -594,7 +596,7 @@ function Recipes({ recipes }) {
 export default Recipes;
 ```
 
-And a new RecipeDetail component:
+And a RecipeDetail component:
 
 ```js
 import React from "react";
@@ -611,21 +613,27 @@ function RecipeDetail(props) {
 export default RecipeDetail;
 ```
 
-We'll use this component in the next step to explore routing.
+`App.js` imports and renders `Recipe.js`.
+
+`Recipe.js` imports nothing and renders.
+
+We'll use these components in the next steps to explore routing.
 
 ## Client Side Routing
 
-Routing is the ability to move between different parts of an application when a user enters a URL or clicks an element (link, button, icon, image etc) within the application.
-
 Up until this point, you have dealt with simple projects that do not require transitioning from one view to another. You have yet to work with Routing in React.
 
-To begin exploring client side routing we'll use the Reach Router.
+Routing is the ability to move between different parts of an application when a user enters a URL or clicks an element.
 
-npm import [react router](https://github.com/ReactTraining/react-router#readme) and import the router into App.
+To begin exploring client side routing we'll use the React Router.
 
 _Note_: be sure you are cd'ed into the client directory before installing React related packages.
 
-`npm i react-router-dom`
+npm import [react router](https://github.com/ReactTraining/react-router#readme) and import the router into App.
+
+```sh
+npm i react-router-dom
+```
 
 Configure App.js for routing:
 
@@ -667,6 +675,12 @@ function App() {
 export default App;
 ```
 
+`App.js` imports and renders `Recipes.js` and renders either `Recipes.js` or `RecipesDetail.js` depending on the Route.
+
+`Recipes.js` imports and renders `Recipes.js`.
+
+`RecipesDetail.js` imports nothing and renders.
+
 Edit the Recipe component to link to a detail leaving only the description:
 
 ```js
@@ -693,23 +707,6 @@ export default Recipe;
 Note the `Link` import from React router..
 
 ## Recipe Detail
-
-```js
-import React from "react";
-import { useParams } from "react-router-dom";
-
-function RecipeDetail(props) {
-  const { recipeId } = useParams();
-  console.log(recipeId);
-  return (
-    <div>
-      <h1>{recipeId}</h1>
-    </div>
-  );
-}
-
-export default RecipeDetail;
-```
 
 Now that we have a recipes prop available in RecipeDetail we can build out the details themselves:
 
@@ -753,7 +750,7 @@ export default RecipeDetail;
 Add a 'Home' link to the RecipeDetails:
 
 ```js
-import { Link } from "@reach/router";
+import { Link, useParams } from "react-router-dom";
 ...
 <Link to="/">Home</Link>
 ```
@@ -869,7 +866,9 @@ Try:
 />
 ```
 
-Selectively add the Ingredients to the render.
+That gets rid of the error. Why?
+
+Selectively add the Ingredients to the return:
 
 ```js
 return (
@@ -897,7 +896,7 @@ return (
 );
 ```
 
-Another error.
+Another error (you may have to navigate to the details page from the list page).
 
 We could continue with the checking:
 
@@ -1053,14 +1052,68 @@ Import the component into App.js:
 And add it to the routing scheme.
 
 ```js
-<Router>
-  <Recipes path="/" recipes={recipes} />
-  <RecipeDetail path="/recipe/:recipeId" />
-  <RecipeMaintenance path="/maintenance" />
-</Router>
+return (
+  <div>
+    <h1>Recipes!</h1>
+    <Router>
+      <Switch>
+        <Route exact path="/">
+          <Recipes recipes={recipes} />
+        </Route>
+        <Route path="/:recipeId">
+          <RecipeDetail />
+        </Route>
+        <Route path="/maintenance">
+          <RecipeMaintenance />
+        </Route>
+      </Switch>
+    </Router>
+  </div>
+);
 ```
 
-Test the path in the browser.
+Test the path in the browser. You'll get a recipe detail default. Why?
+
+The routing is greedy. That's why we use `exact` on the main route.
+
+in `App.js`:
+
+```js
+return (
+  <div>
+    <h1>Recipes!</h1>
+    <Router>
+      <Switch>
+        <Route exact path="/">
+          <Recipes recipes={recipes} />
+        </Route>
+        <Route path="/recipe/:recipeId">
+          <RecipeDetail />
+        </Route>
+        <Route path="/secret/maintenance">
+          <RecipeMaintenance />
+        </Route>
+      </Switch>
+    </Router>
+  </div>
+);
+```
+
+In `Recipe.js`:
+
+```js
+return (
+  <>
+    <img src={`/img/${image}`} alt={name} />
+    <h3>
+      <Link to={`/recipe/${_id}`}>{title}</Link>
+    </h3>
+    <p>{description}</p>
+  </>
+);
+```
+
+Back to the maintenance form.
 
 Add onSubmit and createRecipe:
 
@@ -1141,7 +1194,13 @@ class RecipeMaintenance extends Component {
 export default RecipeMaintenance;
 ```
 
-Complete the createRecipe function:
+[Uncontrolled components](https://reactjs.org/docs/uncontrolled-components.html) use `refs`. Controlled components use `state`.
+
+## Uncontrolled Class Components
+
+[Refs](https://reactjs.org/docs/refs-and-the-dom.html) provide a way to access DOM nodes or React elements created in the render method.
+
+Add refs to the createRecipe function:
 
 ```js
 import React, { Component } from "react";
@@ -1158,7 +1217,6 @@ class RecipeMaintenance extends Component {
       image: this.imageRef.current.value,
       description: this.descriptionRef.current.value,
     };
-    // this.props.addRecipe(recipe);
     console.log(recipe);
   }
 
@@ -1195,62 +1253,129 @@ class RecipeMaintenance extends Component {
 export default RecipeMaintenance;
 ```
 
-# fall2019-start-here
-
-## RecipeMaintenance Function
-
-Convert the RecipeMaintenance component to a function:
+Add [defaultValues](https://reactjs.org/docs/uncontrolled-components.html#default-values):
 
 ```js
-import React, { useRef } from "react";
+import React, { Component } from "react";
 
-function RecipeMaintenance(props) {
-  const nameRef = useRef();
-  const imageRef = useRef();
-  const descriptionRef = useRef();
+class RecipeMaintenance extends Component {
+  nameRef = React.createRef();
+  imageRef = React.createRef();
+  descriptionRef = React.createRef();
 
-  const createRecipe = (e) => {
+  createRecipe(e) {
     e.preventDefault();
     const recipe = {
-      name: nameRef.current.value,
-      image: imageRef.current.value,
-      description: descriptionRef.current.value,
+      title: this.nameRef.current.value,
+      image: this.imageRef.current.value,
+      description: this.descriptionRef.current.value,
     };
-    props.addRecipe(recipe);
-  };
+    // this.props.addRecipe(recipe);
+    console.log(recipe);
+  }
 
-  return (
-    <div>
-      <h3>Add Recipe Form</h3>
-      <form onSubmit={(e) => createRecipe(e)}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Recipe name"
-          ref={nameRef}
-        />
-        <input
-          type="text"
-          name="image"
-          placeholder="Recipe image"
-          ref={imageRef}
-        />
-        <textarea
-          type="text"
-          name="description"
-          placeholder="Recipe description"
-          ref={descriptionRef}
-        />
-        <button type="submit">Add Recipe</button>
-      </form>
-    </div>
-  );
+  handleChange(e) {
+    console.log("  ", e);
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>Add Recipe Form</h3>
+        <form onSubmit={(e) => this.createRecipe(e)}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Recipe name"
+            defaultValue="recipe name"
+            ref={this.nameRef}
+          />
+          <input
+            type="text"
+            name="image"
+            placeholder="Recipe image"
+            defaultValue="recipe image"
+            ref={this.imageRef}
+          />
+          <textarea
+            type="text"
+            name="description"
+            placeholder="Recipe description"
+            defaultValue="recipe description"
+            ref={this.descriptionRef}
+          />
+          <button type="submit">Add Recipe</button>
+        </form>
+      </div>
+    );
+  }
 }
 
 export default RecipeMaintenance;
 ```
 
-Review the last course section - [Hooks](https://github.com/front-end-intermediate/Hooks)
+## RecipeMaintenance Function
+
+Add a call to addRecipe:
+
+```js
+import React, { Component } from "react";
+
+class RecipeMaintenance extends Component {
+  nameRef = React.createRef();
+  imageRef = React.createRef();
+  descriptionRef = React.createRef();
+
+  createRecipe(e) {
+    e.preventDefault();
+    const recipe = {
+      title: this.nameRef.current.value,
+      image: this.imageRef.current.value,
+      description: this.descriptionRef.current.value,
+    };
+    this.props.addRecipe(recipe);
+    console.log(recipe);
+  }
+
+  handleChange(e) {
+    console.log("  ", e);
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>Add Recipe Form</h3>
+        <form onSubmit={(e) => this.createRecipe(e)}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Recipe name"
+            defaultValue="recipe name"
+            ref={this.nameRef}
+          />
+          <input
+            type="text"
+            name="image"
+            placeholder="Recipe image"
+            defaultValue="recipe image"
+            ref={this.imageRef}
+          />
+          <textarea
+            type="text"
+            name="description"
+            placeholder="Recipe description"
+            defaultValue="recipe description"
+            ref={this.descriptionRef}
+          />
+          <button type="submit">Add Recipe</button>
+        </form>
+      </div>
+    );
+  }
+}
+
+export default RecipeMaintenance;
+```
 
 Add the addRecipe function to App.js and send it as a prop to RecipeMaintenance:
 
@@ -1268,9 +1393,28 @@ const addRecipe = ({ name, image, description }) => {
 
 ...
 
-<RecipeMaintenance path='/maintenance' addRecipe={addRecipe} />;
+return (
+    <div>
+      <h1>Recipes!</h1>
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <Recipes recipes={recipes} />
+          </Route>
+          <Route path="/recipe/:recipeId">
+            <RecipeDetail />
+          </Route>
+          <Route path="/secret/maintenance">
+            <RecipeMaintenance addRecipe={addRecipe} />
+          </Route>
+        </Switch>
+      </Router>
+    </div>
+  );
 
 ```
+
+You should see the new recipe in App in the Components dev tool.
 
 Expand the function to use our api. Note the fetch options:
 
@@ -1283,12 +1427,6 @@ const addRecipe = (recipe) => {
     },
     body: JSON.stringify(recipe),
   })
-    .then((res) => {
-      if (res.ok) {
-        return res;
-      }
-      throw new Error("Could not create a recipe");
-    })
     .then((res) => res.json())
     .then((recipe) =>
       setRecipes([
@@ -1299,11 +1437,12 @@ const addRecipe = (recipe) => {
           description: recipe.description,
         },
       ])
-    );
+    )
+    .catch((error) => console.log(error));
 };
 ```
 
-recipe.controllers:
+<!-- recipe.controllers:
 
 ```js
 exports.add = function (req, res) {
@@ -1312,49 +1451,50 @@ exports.add = function (req, res) {
     return res.send(json);
   });
 };
-```
+
+``` -->
 
 Test the form.
 
-Ooops, wrong name. Swap name for title:
-
-RecipeMaintenance:
-
-```js
-const createRecipe = (e) => {
-  e.preventDefault();
-  const recipe = {
-    title: nameRef.current.value,
-    image: imageRef.current.value,
-    description: descriptionRef.current.value,
-  };
-  props.addRecipe(recipe);
-};
-```
-
 ## Adding a NavBar
 
-Create a Home Link.
+```js
+import React from "react";
+import { Link } from "react-router-dom";
+const Nav = () => {
+  return (
+    <nav>
+      <h1>
+        <Link to="/">Recipes</Link>
+      </h1>
+    </nav>
+  );
+};
+export default Nav;
+```
 
 App.js:
 
 ```js
-render() {
-  return (
-    <>
-      <nav>
-        <Link to='/'>Home</Link>
-      </nav>
-      <Router>
-        <Recipes path='/' recipes={this.state.recipes} />
-        <RecipeDetails path='/recipe/:recipeId' />
-        <RecipeMaintenance path='/maintenance' addRecipe={this.addRecipe} />
-      </Router>
-    </>
-  );
+return (
+  <div>
+    <Router>
+      <Nav />
+      <Switch>
+        <Route exact path="/">
+          <Recipes recipes={recipes} />
+        </Route>
+        <Route path="/recipe/:recipeId">
+          <RecipeDetail />
+        </Route>
+        <Route path="/secret/maintenance">
+          <RecipeMaintenance addRecipe={addRecipe} />
+        </Route>
+      </Switch>
+    </Router>
+  </div>
+);
 ```
-
-Import Link from reach router.
 
 Create some css to support the new element:
 
@@ -1377,10 +1517,442 @@ nav a {
 Add a link to Maintenance:
 
 ```js
-<nav>
-  <Link to="/">Home</Link> <Link to="/maintenance">Maintenance</Link>
-</nav>
+import React from "react";
+import { Link } from "react-router-dom";
+const Nav = () => {
+  return (
+    <nav>
+      <h1>
+        <Link to="/">Recipes</Link>
+        <Link to="/secret/maintenance">Maintenance</Link>
+      </h1>
+    </nav>
+  );
+};
+export default Nav;
 ```
+
+## Custom Hooks
+
+In `index.js` we comment out the import statement and add some test code:
+
+```js
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+// import App from "./components/App";
+
+const postIds = [1, 2, 3, 4, 5, 6, 7, 8];
+
+function App() {
+  const [index, setIndex] = React.useState(0);
+  const [post, setPost] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState("");
+
+  React.useEffect(() => {
+    setLoading(true);
+    fetch(`https://jsonplaceholder.typicode.com/posts/${postIds[index]}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setPost(data);
+        setError(null);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.warn(error.message);
+        setError("error loading data");
+        setLoading(false);
+      });
+  }, [index]);
+
+  const incrementIndex = () => {
+    setIndex((i) => (i === postIds.length - 1 ? i : i + 1));
+  };
+
+  if (loading === true) {
+    return <p>Loading</p>;
+  }
+
+  if (error) {
+    return (
+      <React.Fragment>
+        <p>{error}</p>
+        <button onClick={incrementIndex}>Next Post</button>
+      </React.Fragment>
+    );
+  }
+
+  return (
+    <div className="App">
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
+      {index === postIds.length - 1 ? (
+        <p>No more posts</p>
+      ) : (
+        <button onClick={incrementIndex}>Next Post</button>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.querySelector("#root"));
+```
+
+Working in index.js:
+
+```js
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+// import App from "./components/App";
+
+function useFetch(url) {
+  const [data, setData] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    setLoading(true);
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+        setError(null);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.warn(error.message);
+        setError("error loading data");
+        setLoading(false);
+      });
+  }, [url]);
+
+  return {
+    loading,
+    data,
+    error,
+  };
+}
+
+const postIds = [1, 2, 3, 4, 5, 6, 7, 8];
+
+function App() {
+  const [index, setIndex] = React.useState(0);
+
+  const { loading, data: post, error } = useFetch(
+    `https://jsonplaceholder.typicode.com/posts/${postIds[index]}`
+  );
+
+  const incrementIndex = () => {
+    setIndex((i) => (i === postIds.length - 1 ? i : i + 1));
+  };
+
+  if (loading === true) {
+    return <p>Loading</p>;
+  }
+
+  if (error) {
+    return (
+      <React.Fragment>
+        <p>{error}</p>
+        <button onClick={incrementIndex}>Next Post</button>
+      </React.Fragment>
+    );
+  }
+
+  return (
+    <div className="App">
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
+      {index === postIds.length - 1 ? (
+        <p>No more posts</p>
+      ) : (
+        <button onClick={incrementIndex}>Next Post</button>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.querySelector("#root"));
+```
+
+working in App.js:
+
+```js
+import React from "react"; // , { useState, useEffect }
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Nav from "./Nav";
+import Recipes from "./Recipes";
+import RecipeDetail from "./RecipeDetail";
+import RecipeMaintenance from "./RecipeMaintenance";
+import SignIn from "./SignIn";
+
+import { useFetch } from "../hooks/useFetch";
+
+function App() {
+  // const [recipes, setRecipes] = useState([]);
+
+  // const addRecipe = (recipe) => {
+  //   fetch(`/api/recipes`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(recipe),
+  //   })
+  //     .then((res) => res.json())
+  //     .then((recipe) =>
+  //       setRecipes([
+  //         ...recipes,
+  //         {
+  //           name: recipe.name,
+  //           image: recipe.image,
+  //           description: recipe.description,
+  //         },
+  //       ])
+  //     )
+  //     .catch((error) => console.log(error));
+  // };
+
+  const { loading, data: recipes, error } = useFetch(`/api/recipes`);
+
+  if (loading === true) {
+    return <p>Loading</p>;
+  }
+
+  if (error) {
+    return (
+      <React.Fragment>
+        <p>{error}</p>
+      </React.Fragment>
+    );
+  }
+
+  // useEffect(() => {
+  //   fetch(`/api/recipes`)
+  //     .then((response) => response.json())
+  //     .then((json) => {
+  //       setRecipes(json);
+  //     });
+  // }, []);
+
+  return (
+    <div>
+      <Router>
+        <Nav />
+        <Switch>
+          <Route exact path="/">
+            <Recipes recipes={recipes} />
+          </Route>
+          <Route path="/sign-in" component={SignIn} />
+          <Route path="/recipe/:recipeId">
+            <RecipeDetail />
+          </Route>
+          <Route path="/secret/maintenance">
+            {/* <RecipeMaintenance addRecipe={addRecipe} recipes={recipes} /> */}
+          </Route>
+        </Switch>
+      </Router>
+    </div>
+  );
+}
+
+export default App;
+```
+
+`hooks > useFetch`:
+
+```js
+import React from "react";
+
+export function useFetch(url) {
+  const [data, setData] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    setLoading(true);
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+        setError(null);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.warn(error.message);
+        setError("error loading data");
+        setLoading(false);
+      });
+  }, [url]);
+
+  return {
+    loading,
+    data,
+    error,
+  };
+}
+```
+
+## Making It General
+
+For `RecipeDetail.js`
+
+- reconfigure the useFetch hook:
+
+```js
+import React from "react";
+
+export function useFetch(url, method, body = "") {
+  const [data, setData] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    setLoading(true);
+    fetch(url, {
+      method,
+      ...(body ? { body } : {}),
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+        setError(null);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.warn(error.message);
+        setError("error loading data");
+        setLoading(false);
+      });
+  }, [url, body, method]);
+
+  return {
+    loading,
+    data,
+    error,
+  };
+}
+```
+
+`RecipeDetail.js`:
+
+```js
+import React from "react";
+import { useParams, Link } from "react-router-dom";
+
+import { useFetch } from "../hooks/useFetch";
+
+function RecipeDetail() {
+  const { recipeId } = useParams();
+  const { loading, data: recipe, error } = useFetch(`/api/recipes/${recipeId}`);
+
+  if (loading === true) {
+    return <p>Loading</p>;
+  }
+
+  if (error) {
+    return (
+      <React.Fragment>
+        <p>{error}</p>
+      </React.Fragment>
+    );
+  }
+
+  return (
+    <div key={recipe._id}>
+      <img src={`/img/${recipe.image}`} alt={recipe.title} />
+      <h1>{recipe.title}</h1>
+      <p>{recipe.description}</p>
+      <h3>Ingredients</h3>
+      <ul>
+        {recipe.ingredients.map((ingredient) => (
+          <li key={ingredient}>{ingredient}</li>
+        ))}
+      </ul>
+      <h3>Preparation</h3>
+      <ul>
+        {recipe.preparation.map((prep) => (
+          <li key={prep.step}>{prep.step}</li>
+        ))}
+      </ul>
+      <Link to="/">Home</Link>
+    </div>
+  );
+}
+
+export default RecipeDetail;
+```
+
+## Maintenance
+
+```js
+import React from "react";
+
+function RecipeMaintenance(props) {
+  const [title, setTitle] = React.useState("");
+  const [image, setImage] = React.useState("");
+  const [description, setDescription] = React.useState("");
+
+  const createRecipe = (e) => {
+    e.preventDefault();
+    const recipe = {
+      title,
+      image,
+      description,
+    };
+    // this.props.addRecipe(recipe);
+    console.log(recipe);
+  };
+
+  return (
+    <div>
+      <h3>Add Recipe Form</h3>
+      <form onSubmit={(e) => createRecipe(e)}>
+        <input
+          type="text"
+          name="title"
+          placeholder="Recipe title"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+        />
+        <input
+          type="text"
+          name="image"
+          placeholder="Recipe image"
+          value={image}
+          onChange={(event) => setImage(event.target.value)}
+        />
+        <textarea
+          type="text"
+          name="description"
+          placeholder="Recipe description"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+        />
+        <button type="submit">Add Recipe</button>
+      </form>
+    </div>
+  );
+}
+
+export default RecipeMaintenance;
+```
+
+<!-- HERE -->
+
+https://dev.to/ksushiva/authentication-with-react-js-9e4
+
+https://dev.to/techcheck/react-hooks-usereducer-pnj
+
+https://dev.to/mbellagamba/data-fetching-react-hook-4dfc
 
 Adding delete to RecipeMaintenance:
 
