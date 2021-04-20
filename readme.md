@@ -351,8 +351,8 @@ import React from "react";
 function App() {
   const [recipes, setRecipes] = React.useState([]);
 
-  React.useState(() => {
-    fetch(`http://localhost:5000/api/recipes`)
+  React.useEffect(() => {
+    fetch(`/api/recipes`)
       .then((response) => response.json())
       .then((data) => console.log(data));
   });
@@ -406,11 +406,11 @@ app.use((req, res, next) => {
 });
 ``` -->
 
-## Component Lifecycle
+## Displaying Data
 
-Fetch data from our API using useState and use a Recipe component to display them.
+Fetch data from our API using useEffect and use a Recipe component to display them.
 
-App.js:
+`App.js`:
 
 ```js
 import React from "react";
@@ -418,11 +418,11 @@ import React from "react";
 function App() {
   const [recipes, setRecipes] = React.useState([]);
 
-  React.useState(() => {
+  React.useEffect(() => {
     fetch(`http://localhost:5000/api/recipes`)
       .then((response) => response.json())
       .then((data) => setRecipes(data));
-  });
+  }, []);
 
   return (
     <div>
@@ -506,7 +506,7 @@ function Recipe(props) {
 export default Recipe;
 ```
 
-Add keys to Recipe.js:
+Add keys to `Recipe.js`:
 
 ```js
 import React from "react";
@@ -544,39 +544,9 @@ function Recipe(props) {
 export default Recipe;
 ```
 
-<!-- Convert the App component to a function:
+In preparation for the next steps, create two new components.
 
-```js
-import React, { useState, useEffect } from "react";
-import Recipe from "./Recipe";
-
-function App() {
-  const [recipes, setRecipes] = useState([]);
-
-  useEffect(() => {
-    fetch(`/api/recipes`)
-      .then((response) => response.json())
-      .then((json) => {
-        setRecipes(json);
-      });
-  });
-
-  return (
-    <div>
-      {/* <pre>{JSON.stringify(this.state.recipes, null, 2)}</pre> */}
-      {recipes.map((recipe) => (
-        <Recipe key={recipe._id} recipe={recipe} />
-      ))}
-    </div>
-  );
-}
-
-export default App;
-``` -->
-
-In preparation for the next steps, create two new componetns.
-
-A Recipes component:
+A `Recipes` component:
 
 ```js
 import React from "react";
@@ -613,9 +583,7 @@ function RecipeDetail(props) {
 export default RecipeDetail;
 ```
 
-`App.js` imports and renders `Recipe.js`.
-
-`Recipe.js` imports nothing and renders.
+(`App.js` imports and renders `Recipe.js`. `Recipe.js` imports nothing and renders.)
 
 We'll use these components in the next steps to explore routing.
 
@@ -625,7 +593,7 @@ Up until this point, you have dealt with simple projects that do not require tra
 
 Routing is the ability to move between different parts of an application when a user enters a URL or clicks an element.
 
-To begin exploring client side routing we'll use the React Router.
+To begin exploring client side routing we'll use the [React Router](https://reactrouter.com/web/guides/quick-start).
 
 _Note_: be sure you are cd'ed into the client directory before installing React related packages.
 
@@ -638,16 +606,16 @@ npm i react-router-dom
 Configure App.js for routing:
 
 ```js
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import React from "react";
 // import Recipe from "./Recipe";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Recipes from "./Recipes";
 import RecipeDetail from "./RecipeDetail";
 
 function App() {
-  const [recipes, setRecipes] = useState([]);
+  const [recipes, setRecipes] = React.useState([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetch(`/api/recipes`)
       .then((response) => response.json())
       .then((json) => {
@@ -708,7 +676,7 @@ Note the `Link` import from React router..
 
 ## Recipe Detail
 
-Now that we have a recipes prop available in RecipeDetail we can build out the details themselves:
+Build out the details in RecipeDetail using filter and useParams:
 
 ```js
 import React from "react";
@@ -747,7 +715,7 @@ function RecipeDetail(props) {
 export default RecipeDetail;
 ```
 
-Add a 'Home' link to the RecipeDetails:
+Add a 'Home' link to `RecipeDetail.js`:
 
 ```js
 import { Link, useParams } from "react-router-dom";
@@ -757,7 +725,7 @@ import { Link, useParams } from "react-router-dom";
 
 ## Fetching
 
-Currently a recipe is extracted from props using filter. If we refresh the page there is no recipes props to filter and we get an error.
+Currently a recipe is extracted from recipes props using filter.
 
 Let's fetch the recipe based on the recipe id instead.
 
@@ -915,9 +883,9 @@ function RecipeDetail(props) {
       .then((response) => response.json())
       .then((json) => {
         setRecipe(json);
+        setLoading(false);
       })
-      .then(setLoading(false))
-      .catch((err) => console.log(err));
+      .catch((err) => console.warn(err));
   }, [recipeId]);
 
   if (loading) return <p>Loading...</p>;
@@ -974,6 +942,7 @@ function RecipeDetail() {
     ingredients: [],
     preparation: [],
   });
+
   const [loading, setLoading] = React.useState(false);
   const { recipeId } = useParams();
 
@@ -983,8 +952,7 @@ function RecipeDetail() {
       .then((response) => response.json())
       .then((json) => {
         setRecipe(json);
-      })
-      .then(setLoading(false))
+        setLoading(false);
       .catch((err) => console.log(err));
   }, [recipeId]);
 
@@ -1019,7 +987,7 @@ export default RecipeDetail;
 
 We'll mimic a administration panel (which would normally be password protected etc.) with a maintenance component. Security through obscurity!
 
-RecipeMaintenance.js:
+`RecipeMaintenance.js:`
 
 ```js
 import React, { Component } from "react";
@@ -1074,7 +1042,7 @@ return (
 
 Test the path in the browser. You'll get a recipe detail default. Why?
 
-The routing is greedy. That's why we use `exact` on the main route.
+`switch` is greedy. It takes the first valid route it finds. That's why we use `exact` on the main route.
 
 in `App.js`:
 
@@ -1253,7 +1221,7 @@ class RecipeMaintenance extends Component {
 export default RecipeMaintenance;
 ```
 
-Add [defaultValues](https://reactjs.org/docs/uncontrolled-components.html#default-values):
+Refs use [defaultValues](https://reactjs.org/docs/uncontrolled-components.html#default-values) when you want to provide a default:
 
 ```js
 import React, { Component } from "react";
@@ -1270,7 +1238,6 @@ class RecipeMaintenance extends Component {
       image: this.imageRef.current.value,
       description: this.descriptionRef.current.value,
     };
-    // this.props.addRecipe(recipe);
     console.log(recipe);
   }
 
@@ -1316,7 +1283,9 @@ export default RecipeMaintenance;
 
 ## RecipeMaintenance Function
 
-Add a call to addRecipe:
+Add a call to a function `addRecipe.js` we will create.
+
+`RecipeMaintenance.js`:
 
 ```js
 import React, { Component } from "react";
@@ -1334,11 +1303,6 @@ class RecipeMaintenance extends Component {
       description: this.descriptionRef.current.value,
     };
     this.props.addRecipe(recipe);
-    console.log(recipe);
-  }
-
-  handleChange(e) {
-    console.log("  ", e);
   }
 
   render() {
@@ -1357,7 +1321,7 @@ class RecipeMaintenance extends Component {
             type="text"
             name="image"
             placeholder="Recipe image"
-            defaultValue="recipe image"
+            defaultValue="toast.png"
             ref={this.imageRef}
           />
           <textarea
@@ -1377,19 +1341,28 @@ class RecipeMaintenance extends Component {
 export default RecipeMaintenance;
 ```
 
-Add the addRecipe function to App.js and send it as a prop to RecipeMaintenance:
+Note: there is no need for an `onChange` handler when using refs:
 
 ```js
-const addRecipe = ({ name, image, description }) => {
-  setRecipes([
-    ...recipes,
-    {
-      name: name,
-      image: image,
-      description: description
-    }
-  ]);
-};
+handleChange(e) {
+  console.log("  ", e);
+}
+```
+
+Add the addRecipe function to App.js and props drill it down to `RecipeMaintenance`:
+
+```js
+  const addRecipe = (recipe) => {
+    console.log(" from App ::: ", recipe);
+    setRecipes([
+      ...recipes,
+      {
+        name: recipe.name,
+        image: recipe.image,
+        description: recipe.description,
+      },
+    ]);
+  };
 
 ...
 
@@ -1442,38 +1415,32 @@ const addRecipe = (recipe) => {
 };
 ```
 
-<!-- recipe.controllers:
-
-```js
-exports.add = function (req, res) {
-  Recipe.create(req.body, function (err, json) {
-    if (err) return res.send(err);
-    return res.send(json);
-  });
-};
-
-``` -->
-
 Test the form.
 
 ## Adding a NavBar
 
+Create `Nav.js`:
+
 ```js
 import React from "react";
 import { Link } from "react-router-dom";
+
 const Nav = () => {
   return (
     <nav>
-      <h1>
-        <Link to="/">Recipes</Link>
-      </h1>
+      <ul>
+        <li>
+          <Link to="/">Recipes</Link>
+        </li>
+      </ul>
     </nav>
   );
 };
+
 export default Nav;
 ```
 
-App.js:
+Import it and render in `App.js`:
 
 ```js
 return (
@@ -1508,6 +1475,10 @@ nav {
   display: flex;
   align-content: center;
 }
+nav ul {
+  list-style: none;
+  padding: 0;
+}
 nav a {
   color: #fff;
   padding: 1rem;
@@ -1519,6 +1490,7 @@ Add a link to Maintenance:
 ```js
 import React from "react";
 import { Link } from "react-router-dom";
+
 const Nav = () => {
   return (
     <nav>
@@ -1529,8 +1501,11 @@ const Nav = () => {
     </nav>
   );
 };
+
 export default Nav;
 ```
+
+And style accordingly.
 
 ## Custom Hooks
 
@@ -1600,7 +1575,77 @@ function App() {
 ReactDOM.render(<App />, document.querySelector("#root"));
 ```
 
-Working in index.js:
+Create a function `useFetch` in index.js:
+
+```js
+// import App from "./components/App";
+// NEW
+function useFetch(url) {
+  const [data, setData] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    setLoading(true);
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+        setError(null);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.warn(error.message);
+        setError("error loading data");
+        setLoading(false);
+      });
+  }, [url]);
+
+  return {
+    loading,
+    data,
+    error,
+  };
+}
+```
+
+Destructure the elements from the function in App:
+
+```js
+// const [post, setPost] = React.useState([]);
+// const [loading, setLoading] = React.useState(false);
+// const [error, setError] = React.useState("");
+
+const { loading, data: post, error } = useFetch(
+  `https://jsonplaceholder.typicode.com/posts/${postIds[index]}`
+);
+```
+
+And comment out the current useEffect:
+
+```js
+const { loading, data: post, error } = useFetch(
+  `https://jsonplaceholder.typicode.com/posts/${postIds[index]}`
+);
+
+// React.useEffect(() => {
+//   setLoading(true);
+//   fetch(`https://jsonplaceholder.typicode.com/posts/${postIds[index]}`)
+//     .then((res) => res.json())
+//     .then((data) => {
+//       setPost(data);
+//       setError(null);
+//       setLoading(false);
+//     })
+//     .catch((error) => {
+//       console.warn(error.message);
+//       setError("error loading data");
+//       setLoading(false);
+//     });
+// }, [index]);
+```
+
+Test and clean up the file.
 
 ```js
 import React from "react";
@@ -1679,91 +1724,7 @@ function App() {
 ReactDOM.render(<App />, document.querySelector("#root"));
 ```
 
-working in App.js:
-
-```js
-import React from "react"; // , { useState, useEffect }
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Nav from "./Nav";
-import Recipes from "./Recipes";
-import RecipeDetail from "./RecipeDetail";
-import RecipeMaintenance from "./RecipeMaintenance";
-import SignIn from "./SignIn";
-
-import { useFetch } from "../hooks/useFetch";
-
-function App() {
-  // const [recipes, setRecipes] = useState([]);
-
-  // const addRecipe = (recipe) => {
-  //   fetch(`/api/recipes`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(recipe),
-  //   })
-  //     .then((res) => res.json())
-  //     .then((recipe) =>
-  //       setRecipes([
-  //         ...recipes,
-  //         {
-  //           name: recipe.name,
-  //           image: recipe.image,
-  //           description: recipe.description,
-  //         },
-  //       ])
-  //     )
-  //     .catch((error) => console.log(error));
-  // };
-
-  const { loading, data: recipes, error } = useFetch(`/api/recipes`);
-
-  if (loading === true) {
-    return <p>Loading</p>;
-  }
-
-  if (error) {
-    return (
-      <React.Fragment>
-        <p>{error}</p>
-      </React.Fragment>
-    );
-  }
-
-  // useEffect(() => {
-  //   fetch(`/api/recipes`)
-  //     .then((response) => response.json())
-  //     .then((json) => {
-  //       setRecipes(json);
-  //     });
-  // }, []);
-
-  return (
-    <div>
-      <Router>
-        <Nav />
-        <Switch>
-          <Route exact path="/">
-            <Recipes recipes={recipes} />
-          </Route>
-          <Route path="/sign-in" component={SignIn} />
-          <Route path="/recipe/:recipeId">
-            <RecipeDetail />
-          </Route>
-          <Route path="/secret/maintenance">
-            {/* <RecipeMaintenance addRecipe={addRecipe} recipes={recipes} /> */}
-          </Route>
-        </Switch>
-      </Router>
-    </div>
-  );
-}
-
-export default App;
-```
-
-`hooks > useFetch`:
+Create a hooks directory in src, move the custom hook with the changes below into it, and export it.
 
 ```js
 import React from "react";
@@ -1797,9 +1758,217 @@ export function useFetch(url) {
 }
 ```
 
+and import the hook into `index.js`:
+
+```js
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+// import App from "./components/App";
+
+import { useFetch } from "./hooks/useFetch";
+
+const postIds = [1, 2, 3, 4, 5, 6, 7, 8];
+
+function App() {
+  const [index, setIndex] = React.useState(0);
+
+  const { loading, data: post, error } = useFetch(
+    `https://jsonplaceholder.typicode.com/posts/${postIds[index]}`
+  );
+
+  const incrementIndex = () => {
+    setIndex((i) => (i === postIds.length - 1 ? i : i + 1));
+  };
+
+  if (loading === true) {
+    return <p>Loading</p>;
+  }
+
+  if (error) {
+    return (
+      <React.Fragment>
+        <p>{error}</p>
+        <button onClick={incrementIndex}>Next Post</button>
+      </React.Fragment>
+    );
+  }
+
+  return (
+    <div className="App">
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
+      {index === postIds.length - 1 ? (
+        <p>No more posts</p>
+      ) : (
+        <button onClick={incrementIndex}>Next Post</button>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.querySelector("#root"));
+```
+
+Reset `index.js` to use our old App file. We will retrofit our hook for use in out recipes app.
+
+<!-- ```js
+import React from "react";
+
+export function useFetch(url, method, body = "") {
+  const [data, setData] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    setLoading(true);
+    fetch(url, {
+      method,
+      ...(body ? { body } : {}),
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+        setError(null);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.warn(error.message);
+        setError("error loading data");
+        setLoading(false);
+      });
+  }, [url, body, method]);
+
+  return {
+    loading,
+    data,
+    error,
+  };
+}
+``` -->
+
+- import the hook into App.js:
+
+```js
+import { useFetch } from "../hooks/useFetch";
+```
+
+Destructure useFetch's return values
+
+```js
+function App() {
+  const { loading, data, error } = useFetch(`/api/recipes`);
+  const [recipes, setRecipes] = React.useState(data);
+```
+
+And comment out the recipes route:
+
+```js
+<Route exact path="/">
+  {/* <Recipes recipes={data} /> */}
+</Route>
+```
+
+There should be an error on reload.
+
+Add the loading and error returns we used in the json placeholder example:
+
+```js
+if (loading === true) {
+  return <p>Loading</p>;
+}
+
+if (error) {
+  return (
+    <React.Fragment>
+      <p>{error}</p>
+    </React.Fragment>
+  );
+}
+```
+
+Here is App.js in its entirety:
+
+```js
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Nav from "./Nav";
+import Recipes from "./Recipes";
+import RecipeDetail from "./RecipeDetail";
+import RecipeMaintenance from "./RecipeMaintenance";
+
+import { useFetch } from "../hooks/useFetch";
+
+function App() {
+  const { loading, data, error } = useFetch(`/api/recipes`);
+  const [recipes, setRecipes] = React.useState(data);
+
+  const addRecipe = (recipe) => {
+    fetch(`/api/recipes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(recipe),
+    })
+      .then((res) => res.json())
+      .then((recipe) =>
+        setRecipes([
+          ...recipes,
+          {
+            name: recipe.name,
+            image: recipe.image,
+            description: recipe.description,
+          },
+        ])
+      )
+      .catch((error) => console.log(error));
+  };
+
+  if (loading === true) {
+    return <p>Loading</p>;
+  }
+
+  if (error) {
+    return (
+      <React.Fragment>
+        <p>{error}</p>
+      </React.Fragment>
+    );
+  }
+
+  return (
+    <div>
+      <h1>Recipes!</h1>
+      <Router>
+        <Nav />
+        <Switch>
+          <Route exact path="/">
+            <Recipes recipes={data} />
+          </Route>
+          <Route path="/recipe/:recipeId">
+            <RecipeDetail />
+          </Route>
+          <Route path="/secret/maintenance">
+            <RecipeMaintenance addRecipe={addRecipe} />
+          </Route>
+        </Switch>
+      </Router>
+    </div>
+  );
+}
+
+export default App;
+```
+
 ## Making It General
 
-For `RecipeDetail.js`
+We can use our hook in `RecipeDetail.js`.
 
 - reconfigure the useFetch hook:
 
@@ -1842,7 +2011,61 @@ export function useFetch(url, method, body = "") {
 }
 ```
 
-`RecipeDetail.js`:
+Note: we need to pass a method now.
+
+In App.js:
+
+```js
+const { loading, data, error } = useFetch(`/api/recipes`, "get");
+```
+
+In `RecipeDetail.js`:
+
+- import the hook:
+
+```js
+import React from "react";
+import { useParams, Link } from "react-router-dom";
+import { useFetch } from "../hooks/useFetch";
+```
+
+Comment out the recipe state:
+
+```js
+// const [recipe, setRecipe] = React.useState({
+//   title: "",
+//   description: "",
+//   image: "toast.png",
+//   ingredients: [],
+//   preparation: [],
+// });
+
+// const [loading, setLoading] = React.useState(false);
+```
+
+And the fetch:
+
+```js
+// React.useEffect(() => {
+//   setLoading(true);
+//   fetch(`/api/recipes/${recipeId}`)
+//     .then((response) => response.json())
+//     .then((json) => {
+//       setRecipe(json);
+//       setLoading(false);
+//     })
+//     .catch((err) => console.log(err));
+// }, [recipeId]);
+```
+
+Use the hook:
+
+```js
+const { recipeId } = useParams();
+const { loading, data: recipe, error } = useFetch(`/api/recipes/${recipeId}`);
+```
+
+RecipeDetail in its entirety:
 
 ```js
 import React from "react";
@@ -1891,7 +2114,460 @@ function RecipeDetail() {
 export default RecipeDetail;
 ```
 
-## Maintenance
+## Reduce
+
+```js
+const nums = [2, 4, 6];
+let state = 0;
+
+function sum(value) {
+  state += value;
+}
+
+nums.forEach(sum);
+
+console.log("state", state);
+```
+
+`forEach` adds up all of the values but we need an intermediate value (state).
+
+`forEach` is dependent on the state of our application and its modifying state outside of its own scope - this makes it an "impure" function - avoid this when possible with the `reduce` method.
+
+```js
+const nums = [2, 4, 6];
+
+function reducer(state, value) {
+  return state + value;
+}
+
+const total = nums.reduce(reducer, 0);
+
+console.log("total", total);
+```
+
+- The very first time the reducer function is invoked, state will be 0 and value will be 2.
+- On the next invocation, state will be whatever the previous invocation returned, which was 0 + 2 and value will be the 2nd element in the array, 4.
+- On the next invocation, state will be 6 (2 + 4) and value will be 6.
+- Finally, since are no more elements in the collection to iterate over, the returned value will be 6 + 6 or 12.
+
+```
+Initial Value: 0
+
+First invocation:
+  state: 0
+  value: 2
+
+Second invocation:
+  state: 2
+  value: 4
+
+Third invocation:
+  state: 6
+  value: 6
+
+No more elements in the collection, return 6 + 6 which is 12.
+```
+
+Note: the default initializer for reduce is the first value in the array so it could be written as:
+
+```js
+const nums = [2, 4, 6];
+
+function reducer(state, value) {
+  return state + value;
+}
+
+const total = nums.reduce(reducer);
+
+console.log("total", total);
+```
+
+React comes with a built-in Hook called useReducer that allows you to add state to a function component but manage that state using the reducer pattern.
+
+`useReducer` returns an array with the first element being the state and the second element being a dispatch function which when called, will invoke the reducer.
+
+```js
+const [state, dispatch] = React.useReducer(reducer, initialState);
+```
+
+Examine the following code in index.js:
+
+```js
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+// import App from "./components/App";
+
+function reducer(state, value) {
+  return state + value;
+}
+
+function Counter() {
+  const [count, dispatch] = React.useReducer(reducer, 0);
+
+  return (
+    <>
+      <h1>{count}</h1>
+      <button onClick={() => dispatch(1)}>+</button>
+    </>
+  );
+}
+
+ReactDOM.render(<Counter />, document.querySelector("#root"));
+```
+
+When + is clicked, dispatch will be invoked. That calls reducer passing it two arguments,
+
+1. state, which will come implicitly from React,
+2. value, which will be whatever was passed to dispatch.
+
+What we return from reducer will become the new count.
+
+Finally, because count changed, React will re-render the component, updating the UI.
+
+Subtracting:
+
+```js
+function reducer(state, value) {
+  return state + value;
+}
+
+function Counter() {
+  const [count, dispatch] = React.useReducer(reducer, 0);
+
+  return (
+    <React.Fragment>
+      <h1>{count}</h1>
+      <button onClick={() => dispatch(1)}>+</button>
+      <button onClick={() => dispatch(-1)}> - </button>{" "}
+    </React.Fragment>
+  );
+}
+```
+
+Typically in React, instead of dispatching the value we dispatch the type of action that occurred:
+
+```js
+function reducer(state, action) {
+  if (action === "increment") {
+    return state + 1;
+  } else if (action === "decrement") {
+    return state - 1;
+  } else if (action === "reset") {
+    return 0;
+  } else {
+    throw new Error(`This action type isn't supported.`);
+  }
+}
+
+function Counter() {
+  const [count, dispatch] = React.useReducer(reducer, 0);
+
+  return (
+    <React.Fragment>
+      <h1>{count}</h1>
+      <button onClick={() => dispatch("increment")}>+</button>
+      <button onClick={() => dispatch("decrement")}>-</button>
+      <button onClick={() => dispatch("reset")}>Reset</button>
+    </React.Fragment>
+  );
+}
+```
+
+We’ve decoupled the update logic of count from our component. We’re now mapping actions to state changes and separating how the state updates from the action that occurred.
+
+Instead of incrementing and decrementing count by 1, let’s decide via a slider
+
+Create Slider.js in components:
+
+```js
+import React from "react";
+
+export default function Slider({ onChange }) {
+  const [value, setValue] = React.useState(1);
+
+  return (
+    <>
+      {value}
+      <input
+        type="range"
+        min="1"
+        max="10"
+        value={value}
+        onChange={(e) => {
+          const value = Number(e.target.value);
+          onChange(value);
+          setValue(value);
+        }}
+      />
+    </>
+  );
+}
+```
+
+And change index.js:
+
+```js
+import Slider from "./components/Slider";
+
+function reducer(state, action) {
+  if (action.type === "increment") {
+    return {
+      count: state.count + state.step,
+      step: state.step,
+    };
+  } else if (action.type === "decrement") {
+    return {
+      count: state.count - state.step,
+      step: state.step,
+    };
+  } else if (action.type === "reset") {
+    return {
+      count: 0,
+      step: state.step,
+    };
+  } else if (action.type === "updateStep") {
+    return {
+      count: state.count,
+      step: action.step,
+    };
+  } else {
+    throw new Error();
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = React.useReducer(reducer, { count: 0, step: 1 });
+
+  return (
+    <>
+      <Slider
+        onChange={(value) =>
+          dispatch({
+            type: "updateStep",
+            step: value,
+          })
+        }
+      />
+      <hr />
+      <h1>{state.count}</h1>
+      <button
+        onClick={() =>
+          dispatch({
+            type: "increment",
+          })
+        }
+      >
+        +
+      </button>
+      <button
+        onClick={() =>
+          dispatch({
+            type: "decrement",
+          })
+        }
+      >
+        -
+      </button>
+      <button
+        onClick={() =>
+          dispatch({
+            type: "reset",
+          })
+        }
+      >
+        Reset
+      </button>
+    </>
+  );
+}
+```
+
+To use a step we need to use an object for the intial state of our reducer:
+
+```js
+const [state, dispatch] = React.useReducer(reducer, { count: 0, step: 1 });
+```
+
+And since state is no longer an integer we updated the reducer:
+
+```js
+function reducer(state, action) {
+  if (action === "increment") {
+    return {
+      count: state.count + 1,
+      step: state.step,
+    };
+  } else if (action === "decrement") {
+    return {
+      count: state.count - 1,
+      step: state.step,
+    };
+  } else if (action === "reset") {
+    return {
+      count: 0,
+      step: state.step,
+    };
+  } else {
+    throw new Error(`This action type isn't supported.`);
+  }
+}
+```
+
+Previously we dispatched the type of action that occurred (increment, decrement, and reset).
+
+We pass along the value of the slider so we can update our step state and we've updated our dispatches to pass an object:
+
+```js
+<>
+  <Slider
+    onChange={(value) =>
+      dispatch({
+        type: "updateStep",
+        step: value,
+      })
+    }
+  />
+  <hr />
+  <h1>{state.count}</h1>
+  <button
+    onClick={() =>
+      dispatch({
+        type: "increment",
+      })
+    }
+  >
+    +
+  </button>
+  <button
+    onClick={() =>
+      dispatch({
+        type: "decrement",
+      })
+    }
+  >
+    -
+  </button>
+  <button
+    onClick={() =>
+      dispatch({
+        type: "reset",
+      })
+    }
+  >
+    Reset
+  </button>
+</>
+```
+
+Finally, we account for
+
+- our new action updateStep,
+- changing action to be an object instead of a string
+- adjust increment and decrement to adjust the count based on the step property and not just 1
+
+```js
+function reducer(state, action) {
+  if (action.type === "increment") {
+    return {
+      count: state.count + state.step,
+      step: state.step,
+    };
+  } else if (action.type === "decrement") {
+    return {
+      count: state.count - state.step,
+      step: state.step,
+    };
+  } else if (action.type === "reset") {
+    return {
+      count: 0,
+      step: state.step,
+    };
+  } else if (action.type === "updateStep") {
+    return {
+      count: state.count,
+      step: action.step,
+    };
+  } else {
+    throw new Error();
+  }
+}
+```
+
+Let's try a simple experiment on our recipes home page.
+
+Reset index.js so its displaying the recipes.
+
+- add a reducer after the imports:
+
+```js
+const reducer = (state, action) => {
+  switch (action) {
+    case "on":
+      return true;
+    case "off":
+      return false;
+    default:
+      return state;
+  }
+};
+```
+
+- add the useReducer hook:
+
+```js
+const { loading, data, error } = useFetch(`/api/recipes`, "get");
+const [recipes, setRecipes] = React.useState(data);
+// NEW
+const [light, dispatch] = React.useReducer(reducer, true);
+```
+
+- add two buttons after the header:
+
+```js
+<header>
+  <h1>Recipes!</h1>
+  <div>
+    <button onClick={() => dispatch("on")}>Light</button>
+    <button onClick={() => dispatch("off")}>Dark</button>
+  </div>
+</header>
+```
+
+- finally, add css
+
+```js
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+div {
+  padding: 1rem;
+}
+
+div.lit {
+  background-color: #fff;
+}
+
+.unlit {
+  background-color: #555;
+}
+
+.unlit {
+  color: #fff;
+}
+
+.unlit a {
+  color: #eee;
+}
+```
+
+## Instructor Notes
+
+Convert the maintenance screen to a functional component with state:
 
 ```js
 import React from "react";

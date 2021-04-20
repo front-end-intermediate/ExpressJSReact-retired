@@ -38,7 +38,7 @@ exports.delete = function (req, res) {
   });
 };
 
-exports.import = function (res) {
+exports.import = function (req, res) {
   Recipe.create(
     {
       title: "Lasagna",
@@ -95,7 +95,7 @@ exports.import = function (res) {
   );
 };
 
-exports.killall = function (res) {
+exports.killall = function (req, res) {
   Recipe.deleteMany({}, (err) => {
     if (err) return console.log(err);
     return res.sendStatus(202);
