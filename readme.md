@@ -2,7 +2,13 @@
 
 ## Reading
 
-Read and step through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect](https://reactjs.org/docs/hooks-effect.html) documentation. You may wish to use Code Sandbox to examine the code samples.
+You should have read and stepped through the [useState](https://reactjs.org/docs/hooks-state.html) and [useEffect](https://reactjs.org/docs/hooks-effect.html) documentation. You may wish to use Code Sandbox to examine the code samples.
+
+Read:
+
+- [Building Your Own Hooks](https://reactjs.org/docs/hooks-custom.html)
+- [useContext](https://reactjs.org/docs/context.html)
+- [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer)
 
 ## Exercise: React Front End
 
