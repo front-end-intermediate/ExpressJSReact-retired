@@ -1811,6 +1811,8 @@ function App() {
 ReactDOM.render(<App />, document.querySelector("#root"));
 ```
 
+<!-- HERE -->
+
 Reset `index.js` to use our old App file. We will retrofit our hook for use in out recipes app.
 
 <!-- ```js
