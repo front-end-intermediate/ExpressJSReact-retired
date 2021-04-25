@@ -17,6 +17,7 @@ const FormCreateRecipe = () => {
     console.log(" name ", name);
     setValues({ ...values, [name]: value });
   };
+
   return (
     <div>
       <h3>Add Recipe Form</h3>

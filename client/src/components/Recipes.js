@@ -5,7 +5,7 @@ import FormCreateRecipe from "./FormCreateRecipe";
 function Recipes({ recipes, loggedin, addRecipe }) {
   return (
     <div>
-      {loggedin ? <FormCreateRecipe addRecipe={addRecipe} /> : ""}
+      {loggedin ? <FormCreateRecipe /> : ""}
       {recipes.map((recipe) => (
         <Recipe key={recipe._id} recipe={recipe} />
       ))}

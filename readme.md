@@ -1559,13 +1559,15 @@ const FormCreateRecipe = () => {
 export default FormCreateRecipe;
 ```
 
-Import the component into Recipes.js:
-
-`import FormCreateRecipe from './FormCreateRecipe';`
-
-## Poor Man's Login
-
 Allow it to render only if the user is logged in.
+
+- pass the loggin state from App.js to the Recipes component:
+
+```js
+<Recipes recipes={recipes} loggedin={loggedin} />
+```
+
+Import the component into Recipes.js and use a ternary:
 
 ```js
 import React from "react";
@@ -1575,7 +1577,7 @@ import FormCreateRecipe from "./FormCreateRecipe";
 function Recipes({ recipes, loggedin, addRecipe }) {
   return (
     <div>
-      {loggedin ? <FormCreateRecipe addRecipe={addRecipe} /> : ""}
+      {loggedin ? <FormCreateRecipe /> : ""}
       {recipes.map((recipe) => (
         <Recipe key={recipe._id} recipe={recipe} />
       ))}
@@ -1586,7 +1588,7 @@ function Recipes({ recipes, loggedin, addRecipe }) {
 export default Recipes;
 ```
 
-Add values state, handleInputchange and createRecipe functions:
+Add values state, handleInputchange and createRecipe functions to the form:
 
 ```js
 import React from "react";
@@ -1643,77 +1645,46 @@ const FormCreateRecipe = () => {
 export default FormCreateRecipe;
 ```
 
-https://ui.dev/computed-property-names/
+Note the difference between what we are doing here for handling state change for inputs vs. how we accomplished the same task in the [previous class](https://github.com/front-end-intermediate/React-Intro#react-forms-1) (where we were working with pirates).
+
+We are using [computed property names](https://ui.dev/computed-property-names/).
+
+Review Object assignment and computed values:
+
+```js
+var testObj = {};
+
+// dot assignment
+testObj.age = 80;
+console.log(testObj);
+
+var myKey = "name";
+var myValue = "Daniel";
+testObj = {};
+
+// bracket assignment
+testObj[myKey] = myValue;
+console.log(testObj);
+
+// computed values
+const personsList = ["Alan", "Smith", "Kelly", "Jason", "Nicole"];
+var personsObject = {};
+personsList.forEach((currentItem, index) => {
+  personsObject[index] = currentItem;
+});
+console.log(personsObject);
+
+// or
+var personsObjectTwo = {};
+personsList.forEach((currentItem) => {
+  personsObjectTwo[currentItem] = currentItem;
+});
+console.log(personsObjectTwo);
+```
 
 Test the button.
 
-## Recipe Maintenance Function
-
-Add a call to a function `addRecipe.js` we will create.
-
-`RecipeMaintenance.js`:
-
-```js
-import React, { Component } from "react";
-
-class RecipeMaintenance extends Component {
-  nameRef = React.createRef();
-  imageRef = React.createRef();
-  descriptionRef = React.createRef();
-
-  createRecipe(e) {
-    e.preventDefault();
-    const recipe = {
-      title: this.nameRef.current.value,
-      image: this.imageRef.current.value,
-      description: this.descriptionRef.current.value,
-    };
-    this.props.addRecipe(recipe);
-  }
-
-  render() {
-    return (
-      <div>
-        <h3>Add Recipe Form</h3>
-        <form onSubmit={(e) => this.createRecipe(e)}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Recipe name"
-            defaultValue="recipe name"
-            ref={this.nameRef}
-          />
-          <input
-            type="text"
-            name="image"
-            placeholder="Recipe image"
-            defaultValue="toast.png"
-            ref={this.imageRef}
-          />
-          <textarea
-            type="text"
-            name="description"
-            placeholder="Recipe description"
-            defaultValue="recipe description"
-            ref={this.descriptionRef}
-          />
-          <button type="submit">Add Recipe</button>
-        </form>
-      </div>
-    );
-  }
-}
-
-export default RecipeMaintenance;
-```
-
-Note: there is no need for an `onChange` handler when using refs:
-
-```js
-handleChange(e) {
-  console.log("  ", e);
-}
-```
+## addRecipe Function
 
 Add the addRecipe function to App.js and props drill it down to `RecipeMaintenance`:
 

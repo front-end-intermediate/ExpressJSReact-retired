@@ -7,7 +7,7 @@ import { useFetch } from "../hooks/useFetch";
 
 function App() {
   const { loading, data: recipes, error } = useFetch(`/api/recipes`);
-  const [loggedin, setLoggedin] = React.useState(false);
+  const [loggedin, setLoggedin] = React.useState(true);
 
   if (loading === true) {
     return <p>Loading</p>;
@@ -23,7 +23,7 @@ function App() {
         <Nav setLoggedin={setLoggedin} loggedin={loggedin} />
         <Switch>
           <Route exact path="/">
-            <Recipes recipes={recipes} />
+            <Recipes recipes={recipes} loggedin={loggedin} />
           </Route>
           <Route path="/:recipeId">
             <RecipeDetail />
