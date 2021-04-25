@@ -1559,9 +1559,32 @@ const FormCreateRecipe = () => {
 export default FormCreateRecipe;
 ```
 
-Import the component into RecipeDetail.js:
+Import the component into Recipes.js:
 
 `import FormCreateRecipe from './FormCreateRecipe';`
+
+## Poor Man's Login
+
+Allow it to render only if the user is logged in.
+
+```js
+import React from "react";
+import Recipe from "./Recipe";
+import FormCreateRecipe from "./FormCreateRecipe";
+
+function Recipes({ recipes, loggedin, addRecipe }) {
+  return (
+    <div>
+      {loggedin ? <FormCreateRecipe addRecipe={addRecipe} /> : ""}
+      {recipes.map((recipe) => (
+        <Recipe key={recipe._id} recipe={recipe} />
+      ))}
+    </div>
+  );
+}
+
+export default Recipes;
+```
 
 Add values state, handleInputchange and createRecipe functions:
 
