@@ -1686,26 +1686,35 @@ Test the button.
 
 ## addRecipe Function
 
-Add the addRecipe function to App.js and props drill it down to `RecipeMaintenance`:
+Add the addRecipe function to App.js and props drill it down to `Recipes`:
 
 ```js
 const { loading, data, error, setData } = useFetch(`/api/recipes`);
 ...
-  const addRecipe = (recipe) => {
-    console.log(" from App ::: ", recipe);
-    setData([
-      ...data,
-      {
-        title: recipe.title,
-        image: recipe.image,
-        description: recipe.description,
-      },
-    ]);
-  };
+const addRecipe = (recipe) => {
+  console.log("bar:", recipe);
+  fetch(`/api/recipes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(recipe),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(" FOO:: ", data);
+      setData(recipe);
+    })
+    .catch((error) => console.log(error));
+};
+...
+<Recipes recipes={data} loggedin={loggedin} addRecipe={addRecipe} />
 
 ```
 
-You should see the new recipe in App in the Components dev tool.
+Note the additions to the arguments we are passing to the useFetch custom hook.
+
+We will need to make a few changes to the hook in order to accomodate them:
 
 ```js
 import React from "react";
