@@ -1574,7 +1574,7 @@ import React from "react";
 import Recipe from "./Recipe";
 import FormCreateRecipe from "./FormCreateRecipe";
 
-function Recipes({ recipes, loggedin, addRecipe }) {
+function Recipes({ recipes, loggedin }) {
   return (
     <div>
       {loggedin ? <FormCreateRecipe /> : ""}
@@ -1666,20 +1666,24 @@ testObj = {};
 testObj[myKey] = myValue;
 console.log(testObj);
 
-// computed values
-const personsList = ["Alan", "Smith", "Kelly", "Jason", "Nicole"];
-var personsObject = {};
-personsList.forEach((currentItem, index) => {
-  personsObject[index] = currentItem;
-});
-console.log(personsObject);
+// Computed Property Names
+// Before: create the object first, then use bracket notation to assign that property to the value
+function objectify(key, value) {
+  let obj = {};
+  obj[key] = value;
+  return obj;
+}
 
-// or
-var personsObjectTwo = {};
-personsList.forEach((currentItem) => {
-  personsObjectTwo[currentItem] = currentItem;
-});
-console.log(personsObjectTwo);
+objectify("name", "Daniel"); //?
+
+// After: use object literal notation to assign the expression as a property on the object without having to create it first
+function objectifyTwo(key, value) {
+  return {
+    [key]: value,
+  };
+}
+
+objectifyTwo("name", "Dennis"); //?
 ```
 
 Test the button.
@@ -1689,7 +1693,7 @@ Test the button.
 Add the addRecipe function to App.js and props drill it down to `Recipes`:
 
 ```js
-const { loading, data, error, setData } = useFetch(`/api/recipes`);
+  const { loading, data: recipes, error, setData } = useFetch(`/api/recipes`);
 ...
 const addRecipe = (recipe) => {
   console.log("bar:", recipe);
@@ -1708,7 +1712,13 @@ const addRecipe = (recipe) => {
     .catch((error) => console.log(error));
 };
 ...
-<Recipes recipes={data} loggedin={loggedin} addRecipe={addRecipe} />
+<Route exact path="/">
+  <Recipes
+    recipes={recipes}
+    loggedin={loggedin}
+    addRecipe={addRecipe}
+  />
+</Route>
 
 ```
 
@@ -1719,10 +1729,12 @@ We will need to make a few changes to the hook in order to accomodate them:
 ```js
 import React from "react";
 
-export function useFetch(url, method, body = "") {
+export function useFetch(url, method = "GET", body) {
   const [data, setData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+
+  console.log(" DATA1 ::: ", data);
 
   React.useEffect(() => {
     setLoading(true);
@@ -1747,38 +1759,36 @@ export function useFetch(url, method, body = "") {
       });
   }, [url, body, method]);
 
+  console.log(" DATA2 ::: ", data);
+
   return {
     loading,
     data,
     error,
+    setData,
   };
 }
 ```
 
-Expand the function to use our api. Note the fetch options:
+Props drill the addRecipe function to the form:
 
 ```js
-const addRecipe = (recipe) => {
-  fetch(`/api/recipes`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(recipe),
-  })
-    .then((res) => res.json())
-    .then((recipe) =>
-      setRecipes([
-        ...recipes,
-        {
-          name: recipe.name,
-          image: recipe.image,
-          description: recipe.description,
-        },
-      ])
-    )
-    .catch((error) => console.log(error));
-};
+import React from "react";
+import Recipe from "./Recipe";
+import FormCreateRecipe from "./FormCreateRecipe";
+
+function Recipes({ recipes, loggedin, addRecipe }) {
+  return (
+    <div>
+      {loggedin ? <FormCreateRecipe addRecipe={addRecipe} /> : ""}
+      {recipes.map((recipe) => (
+        <Recipe key={recipe._id} recipe={recipe} />
+      ))}
+    </div>
+  );
+}
+
+export default Recipes;
 ```
 
 Test the form.
