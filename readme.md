@@ -1298,7 +1298,6 @@ import { useFetch } from "../hooks/useFetch";
 ```
 
 - Remove the useEffect from App.js
-
 - Destructure useFetch's return values:
 
 ```js
@@ -1323,13 +1322,11 @@ if (loading === true) {
 }
 
 if (error) {
-  return (
-    <React.Fragment>
-      <p>{error}</p>
-    </React.Fragment>
-  );
+  return <p>{error}</p>;
 }
 ```
+
+Review: [destructuring on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment). Note the ability to re-assign variable names and how they differ for Arrays and Objects.
 
 Here is App.js in its entirety:
 
@@ -1338,29 +1335,17 @@ import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Recipes from "./Recipes";
 import RecipeDetail from "./RecipeDetail";
-
 import { useFetch } from "../hooks/useFetch";
 
 function App() {
-  const { loading, data, error } = useFetch(`/api/recipes`);
-  // const [recipes, setRecipes] = React.useState(data);
-
-  // React.useEffect(() => {
-  //   fetch(`/api/recipes`)
-  //     .then((response) => response.json())
-  //     .then((data) => setRecipes(data));
-  // });
+  const { loading, data: recipes, error } = useFetch(`/api/recipes`);
 
   if (loading === true) {
     return <p>Loading</p>;
   }
 
   if (error) {
-    return (
-      <React.Fragment>
-        <p>{error}</p>
-      </React.Fragment>
-    );
+    return <p>{error}</p>;
   }
 
   return (
@@ -1369,7 +1354,7 @@ function App() {
       <Router>
         <Switch>
           <Route exact path="/">
-            <Recipes recipes={data} />
+            <Recipes recipes={recipes} />
           </Route>
           <Route path="/:recipeId">
             <RecipeDetail />
@@ -1385,58 +1370,7 @@ export default App;
 
 ## Detail Custom Hook
 
-We can use our hook in `RecipeDetail.js`.
-
-<!-- - reconfigure the useFetch hook:
-
-```js
-import React from "react";
-
-export function useFetch(url, method, body = "") {
-  const [data, setData] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
-
-  React.useEffect(() => {
-    setLoading(true);
-    fetch(url, {
-      method,
-      ...(body ? { body } : {}),
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-        setError(null);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.warn(error.message);
-        setError("error loading data");
-        setLoading(false);
-      });
-  }, [url, body, method]);
-
-  return {
-    loading,
-    data,
-    error,
-  };
-}
-```
-
-Note: we need to pass a method now.
-
-In App.js:
-
-```js
-const { loading, data, error } = useFetch(`/api/recipes`, "get");
-``` -->
-
-In `RecipeDetail.js`:
+We can also use our hook in `RecipeDetail.js`.
 
 - import the hook:
 
@@ -1482,14 +1416,13 @@ const { recipeId } = useParams();
 const { loading, data: recipe, error } = useFetch(`/api/recipes/${recipeId}`);
 ```
 
-Add the loading and error returns as above
+Add the loading and error returns as in App.js
 
 RecipeDetail in its entirety:
 
 ```js
 import React from "react";
 import { useParams, Link } from "react-router-dom";
-
 import { useFetch } from "../hooks/useFetch";
 
 function RecipeDetail() {
@@ -1501,11 +1434,7 @@ function RecipeDetail() {
   }
 
   if (error) {
-    return (
-      <React.Fragment>
-        <p>{error}</p>
-      </React.Fragment>
-    );
+    return <p>{error}</p>;
   }
 
   return (
@@ -1585,8 +1514,6 @@ return (
 
 Create some css to support the new element:
 
-css:
-
 ```css
 nav {
   min-height: 3rem;
@@ -1610,7 +1537,7 @@ nav a {
 
 ## Adding a Recipe
 
-`FormCreateRecipe.js:`
+Create `FormCreateRecipe.js`:
 
 ```js
 import React from "react";
@@ -1636,73 +1563,7 @@ Import the component into RecipeDetail.js:
 
 `import FormCreateRecipe from './FormCreateRecipe';`
 
-<!-- And add it to the routing scheme.
-
-```js
-return (
-  <div>
-    <h1>Recipes!</h1>
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <Recipes recipes={recipes} />
-        </Route>
-        <Route path="/:recipeId">
-          <RecipeDetail />
-        </Route>
-        <Route path="/maintenance">
-          <RecipeMaintenance />
-        </Route>
-      </Switch>
-    </Router>
-  </div>
-);
-```
-
-Test the path in the browser. You'll get a recipe detail default. Why?
-
-`switch` is greedy. It takes the first valid route it finds. That's why we use `exact` on the main route.
-
-in `App.js`:
-
-```js
-return (
-  <div>
-    <h1>Recipes!</h1>
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <Recipes recipes={recipes} />
-        </Route>
-        <Route path="/recipe/:recipeId">
-          <RecipeDetail />
-        </Route>
-        <Route path="/secret/maintenance">
-          <RecipeMaintenance />
-        </Route>
-      </Switch>
-    </Router>
-  </div>
-);
-```
-
-In `Recipe.js`:
-
-```js
-return (
-  <>
-    <img src={`/img/${image}`} alt={name} />
-    <h3>
-      <Link to={`/recipe/${_id}`}>{title}</Link>
-    </h3>
-    <p>{description}</p>
-  </>
-);
-```
-
-Back to the maintenance form. -->
-
-Add handleInputchange and createRecipe functions:
+Add values state, handleInputchange and createRecipe functions:
 
 ```js
 import React from "react";

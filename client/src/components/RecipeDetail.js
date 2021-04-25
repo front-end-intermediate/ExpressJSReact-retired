@@ -1,30 +1,19 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
+import { useFetch } from "../hooks/useFetch";
+import FormCreateRecipe from "./FormCreateRecipe";
 
 function RecipeDetail() {
-  const [recipe, setRecipe] = React.useState({
-    title: "",
-    description: "",
-    image: "toast.png",
-    ingredients: [],
-    preparation: [],
-  });
-
-  const [loading, setLoading] = React.useState(false);
   const { recipeId } = useParams();
+  const { loading, data: recipe, error } = useFetch(`/api/recipes/${recipeId}`);
 
-  React.useEffect(() => {
-    setLoading(true);
-    fetch(`/api/recipes/${recipeId}`)
-      .then((response) => response.json())
-      .then((json) => {
-        setRecipe(json);
-        setLoading(false);
-      })
-      .catch((err) => console.warn(err));
-  }, [recipeId]);
+  if (loading === true) {
+    return <p>Loading</p>;
+  }
 
-  if (loading) return <p>Loading...</p>;
+  if (error) {
+    return <p>{error}</p>;
+  }
 
   return (
     <div key={recipe._id}>

@@ -2,20 +2,25 @@ import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Recipes from "./Recipes";
 import RecipeDetail from "./RecipeDetail";
+import Nav from "./Nav";
+import { useFetch } from "../hooks/useFetch";
 
 function App() {
-  const [recipes, setRecipes] = React.useState([]);
+  const { loading, data: recipes, error } = useFetch(`/api/recipes`);
+  const [loggedin, setLoggedin] = React.useState(false);
 
-  React.useEffect(() => {
-    fetch(`/api/recipes`)
-      .then((response) => response.json())
-      .then((data) => setRecipes(data));
-  });
+  if (loading === true) {
+    return <p>Loading</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
 
   return (
     <div>
-      <h1>Recipes!</h1>
       <Router>
+        <Nav setLoggedin={setLoggedin} loggedin={loggedin} />
         <Switch>
           <Route exact path="/">
             <Recipes recipes={recipes} />
