@@ -1791,6 +1791,27 @@ function Recipes({ recipes, loggedin, addRecipe }) {
 export default Recipes;
 ```
 
+Destructure addRecipe and call it with a recipe:
+
+```js
+const FormCreateRecipe = ({ addRecipe }) => {
+  const [values, setValues] = React.useState({
+    title: "Recipe Title",
+    image: "toast.png",
+    description: "Description of the recipe",
+  });
+
+  const createRecipe = (event) => {
+    event.preventDefault();
+    const recipe = {
+      title: values.title,
+      image: values.image,
+      description: values.description,
+    };
+    addRecipe(recipe);
+  };
+```
+
 Test the form.
 
 ## Reduce

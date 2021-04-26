@@ -1,6 +1,6 @@
 import React from "react";
 
-const FormCreateRecipe = () => {
+const FormCreateRecipe = ({ addRecipe }) => {
   const [values, setValues] = React.useState({
     title: "Recipe Title",
     image: "toast.png",
@@ -9,7 +9,12 @@ const FormCreateRecipe = () => {
 
   const createRecipe = (event) => {
     event.preventDefault();
-    console.log("making a recipe");
+    const recipe = {
+      title: values.title,
+      image: values.image,
+      description: values.description,
+    };
+    addRecipe(recipe);
   };
 
   const handleInputChange = (event) => {
