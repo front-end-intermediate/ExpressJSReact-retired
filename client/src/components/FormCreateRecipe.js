@@ -1,6 +1,7 @@
 import React from "react";
 
 const FormCreateRecipe = ({ addRecipe }) => {
+  const [temp, setTemp] = React.useState(["one"]);
   const [values, setValues] = React.useState({
     title: "Recipe Title",
     image: "toast.png",
@@ -21,8 +22,15 @@ const FormCreateRecipe = ({ addRecipe }) => {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    console.log(" name ", name);
+    // console.log(" name ", name);
     setValues({ ...values, [name]: value });
+  };
+
+  const appendInput = () => {
+    const newInput = `ingredient-${temp.length}`;
+    console.log("  ", newInput);
+    setTemp([...temp, newInput]);
+    // setTemp({ ...temp, ingredient: newInput });
   };
 
   return (
@@ -50,7 +58,17 @@ const FormCreateRecipe = ({ addRecipe }) => {
           value={values.description}
         />
         <h3>Ingredients</h3>
-        <input
+        {temp.map((ingredient, index) => (
+          <input
+            key={index}
+            type="text"
+            placeholder="Recipe ingredient"
+            value={ingredient}
+            name={`ingredient-${index}`}
+            onChange={handleInputChange}
+          />
+        ))}
+        {/* <input
           type="text"
           placeholder="Recipe ingredient"
           value={values.ingredients[0]}
@@ -63,8 +81,8 @@ const FormCreateRecipe = ({ addRecipe }) => {
           value={values.ingredients[1]}
           name="ingredient"
           onChange={handleInputChange}
-        />
-        <button>+</button>
+        /> */}
+        <button onClick={appendInput}>+</button>
         <hr />
         <button type="submit">Add Recipe</button>
       </form>
