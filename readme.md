@@ -1812,7 +1812,254 @@ const FormCreateRecipe = ({ addRecipe }) => {
   };
 ```
 
-Test the form.
+Test the form. The database is updated but the UI needs a refresh.
+
+## Custom Hook
+
+```js
+const GET = "GET";
+const POST = "POST";
+const PUT = "PUT";
+const PATCH = "PATCH";
+const DEL = "DELETE";
+
+const defaultHeaders = {
+  "Content-Type": "application/json",
+  Accept: "application/json",
+};
+
+async function fetchData({
+  path,
+  method,
+  data,
+  headers,
+  onUnauthorized,
+  onError,
+}) {
+  const response = await fetch(path, {
+    method: method,
+    body: !!data ? JSON.stringify(data) : null,
+    headers: !!headers ? headers : defaultHeaders,
+  }).then((response) => {
+    if (response.status === 204) {
+      return {};
+    } else if (response.status === 401 && !!onUnauthorized) {
+      return onUnauthorized(response);
+    } else if (response.status >= 500 && !!onError) {
+      return onError(response);
+    } else {
+      return response.json();
+    }
+  });
+  console.log(" path ", response);
+  return response;
+}
+
+export function useApi(onUnauthorized, onError) {
+  return {
+    get: (path, headers) =>
+      fetchData({
+        path: path,
+        method: GET,
+        data: null,
+        headers: headers,
+        onUnauthorized: onUnauthorized,
+        onError: onError,
+      }),
+    post: (path, data, headers) =>
+      fetchData({
+        path: path,
+        method: POST,
+        data: data,
+        headers: headers,
+        onUnauthorized: onUnauthorized,
+        onError: onError,
+      }),
+    put: (path, data, headers) =>
+      fetchData({
+        path: path,
+        method: PUT,
+        data: data,
+        headers: headers,
+        onUnauthorized: onUnauthorized,
+        onError: onError,
+      }),
+    patch: (path, data, headers) =>
+      fetchData({
+        path: path,
+        method: PATCH,
+        data: data,
+        headers: headers,
+        onUnauthorized: onUnauthorized,
+        onError: onError,
+      }),
+    del: (path, headers) =>
+      fetchData({
+        path: path,
+        method: DEL,
+        data: null,
+        headers: headers,
+        onUnauthorized: onUnauthorized,
+        onError: onError,
+      }),
+  };
+}
+
+export default useApi;
+```
+
+In App.js:
+
+```js
+import { useApi } from "../hooks/useFetch";
+...
+function App() {
+  const { get, post } = useApi();
+  const [recipes, setRecipes] = React.useState([]);
+  const [recipe, setRecipe] = React.useState();
+  ...
+  React.useEffect(() => {
+    get("/api/recipes").then((data) => {
+      setRecipes(data);
+    });
+  }, [recipe]);
+
+  const addRecipe = (recipe) => {
+    console.log("bar:", recipe);
+    post("/api/recipes", recipe).then((data) => {
+      setRecipe(data);
+    });
+```
+
+Here's the entire App.js file:
+
+```js
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Recipes from "./Recipes";
+import RecipeDetail from "./RecipeDetail";
+import Nav from "./Nav";
+import { useApi } from "../hooks/useFetch";
+
+function App() {
+  const { get, post } = useApi();
+  const [recipes, setRecipes] = React.useState([]);
+  const [recipe, setRecipe] = React.useState();
+  const [loggedin, setLoggedin] = React.useState(true);
+
+  React.useEffect(() => {
+    get("/api/recipes").then((data) => {
+      setRecipes(data);
+    });
+  }, [recipe]);
+
+  const addRecipe = (recipe) => {
+    console.log("bar:", recipe);
+    post("/api/recipes", recipe).then((data) => {
+      setRecipe(data);
+    });
+  };
+
+  return (
+    <div>
+      <Router>
+        <Nav setLoggedin={setLoggedin} loggedin={loggedin} />
+        <Switch>
+          <Route exact path="/">
+            <Recipes
+              recipes={recipes}
+              loggedin={loggedin}
+              addRecipe={addRecipe}
+            />
+          </Route>
+          <Route path="/:recipeId">
+            <RecipeDetail recipes={recipes} />
+          </Route>
+        </Switch>
+      </Router>
+    </div>
+  );
+}
+
+export default App;
+```
+
+## Configure Details View
+
+```js
+import React from "react";
+import { useParams, Link } from "react-router-dom";
+import { useApi } from "../hooks/useFetch";
+
+function RecipeDetail() {
+  const { get } = useApi();
+  const { recipeId } = useParams();
+  const [recipe, setRecipe] = React.useState({
+    title: "",
+    description: "",
+    image: "toast.png",
+    ingredients: [],
+    preparation: [],
+  });
+
+  React.useEffect(() => {
+    get(`api/recipes/${recipeId}`).then((data) => {
+      setRecipe(data);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div>
+      <img src={`/img/${recipe.image}`} alt={recipe.title} />
+      <h1>{recipe.title}</h1>
+      <p>{recipe.description}</p>
+      <h3>Ingredients</h3>
+      <ul>
+        {recipe.ingredients.map((ingredient) => (
+          <li key={ingredient}>{ingredient}</li>
+        ))}
+      </ul>
+      <h3>Preparation</h3>
+      <ul>
+        {recipe.preparation.map((prep) => (
+          <li key={prep.step}>{prep.step}</li>
+        ))}
+      </ul>
+      <Link to="/">Home</Link>
+    </div>
+  );
+}
+
+export default RecipeDetail;
+```
+
+## Delete
+
+App.js:
+
+```js
+  const deleteRecipe = (recipeId) => {
+    console.log("recipeId:", recipeId);
+    del(`/api/recipes/${recipeId}`).then(window.location.replace("/"));
+  };
+  ...
+  <RecipeDetail loggedin={loggedin} deleteRecipe={deleteRecipe} />
+```
+
+RecipeDetail.js:
+
+```js
+{
+  loggedin ? (
+    <button onClick={() => deleteRecipe(recipe._id)}>delete</button>
+  ) : (
+    ""
+  );
+}
+
+<Link to="/">Home</Link>;
+```
 
 ## Reduce
 

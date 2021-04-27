@@ -1,21 +1,27 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
-import { useFetch } from "../hooks/useFetch";
+import { useApi } from "../hooks/useFetch";
 
-function RecipeDetail() {
+function RecipeDetail({ loggedin, deleteRecipe }) {
+  const { get } = useApi();
   const { recipeId } = useParams();
-  const { loading, data: recipe, error } = useFetch(`/api/recipes/${recipeId}`);
+  const [recipe, setRecipe] = React.useState({
+    title: "",
+    description: "",
+    image: "toast.png",
+    ingredients: [],
+    preparation: [],
+  });
 
-  if (loading === true) {
-    return <p>Loading</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
+  React.useEffect(() => {
+    get(`api/recipes/${recipeId}`).then((data) => {
+      setRecipe(data);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <div key={recipe._id}>
+    <div>
       <img src={`/img/${recipe.image}`} alt={recipe.title} />
       <h1>{recipe.title}</h1>
       <p>{recipe.description}</p>
@@ -31,6 +37,12 @@ function RecipeDetail() {
           <li key={prep.step}>{prep.step}</li>
         ))}
       </ul>
+      {loggedin ? (
+        <button onClick={() => deleteRecipe(recipe._id)}>delete</button>
+      ) : (
+        ""
+      )}
+
       <Link to="/">Home</Link>
     </div>
   );

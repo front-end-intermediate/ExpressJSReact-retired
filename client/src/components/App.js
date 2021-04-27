@@ -3,36 +3,30 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Recipes from "./Recipes";
 import RecipeDetail from "./RecipeDetail";
 import Nav from "./Nav";
-import { useFetch } from "../hooks/useFetch";
+import { useApi } from "../hooks/useFetch";
 
 function App() {
-  const { loading, data: recipes, error, setData } = useFetch(`/api/recipes`);
+  const { get, post, del } = useApi();
+  const [recipes, setRecipes] = React.useState([]);
+  const [recipe, setRecipe] = React.useState(null);
   const [loggedin, setLoggedin] = React.useState(true);
 
+  React.useEffect(() => {
+    get("/api/recipes").then((data) => {
+      setRecipes(data);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recipe]);
+
   const addRecipe = (recipe) => {
-    console.log("bar:", recipe);
-    fetch(`/api/recipes`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(recipe),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(" FOO:: ", data);
-        setData(recipe);
-      })
-      .catch((error) => console.log(error));
+    post("/api/recipes", recipe).then((data) => {
+      setRecipe(data);
+    });
   };
 
-  if (loading === true) {
-    return <p>Loading</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
+  const deleteRecipe = (recipeId) => {
+    del(`/api/recipes/${recipeId}`).then(window.location.replace("/"));
+  };
 
   return (
     <div>
@@ -47,7 +41,7 @@ function App() {
             />
           </Route>
           <Route path="/:recipeId">
-            <RecipeDetail />
+            <RecipeDetail loggedin={loggedin} deleteRecipe={deleteRecipe} />
           </Route>
         </Switch>
       </Router>
