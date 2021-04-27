@@ -1298,7 +1298,6 @@ import { useFetch } from "../hooks/useFetch";
 ```
 
 - Remove the useEffect from App.js
-
 - Destructure useFetch's return values:
 
 ```js
@@ -1323,13 +1322,11 @@ if (loading === true) {
 }
 
 if (error) {
-  return (
-    <React.Fragment>
-      <p>{error}</p>
-    </React.Fragment>
-  );
+  return <p>{error}</p>;
 }
 ```
+
+Review: [destructuring on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment). Note the ability to re-assign variable names and how they differ for Arrays and Objects.
 
 Here is App.js in its entirety:
 
@@ -1338,29 +1335,17 @@ import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Recipes from "./Recipes";
 import RecipeDetail from "./RecipeDetail";
-
 import { useFetch } from "../hooks/useFetch";
 
 function App() {
-  const { loading, data, error } = useFetch(`/api/recipes`);
-  // const [recipes, setRecipes] = React.useState(data);
-
-  // React.useEffect(() => {
-  //   fetch(`/api/recipes`)
-  //     .then((response) => response.json())
-  //     .then((data) => setRecipes(data));
-  // });
+  const { loading, data: recipes, error } = useFetch(`/api/recipes`);
 
   if (loading === true) {
     return <p>Loading</p>;
   }
 
   if (error) {
-    return (
-      <React.Fragment>
-        <p>{error}</p>
-      </React.Fragment>
-    );
+    return <p>{error}</p>;
   }
 
   return (
@@ -1369,7 +1354,7 @@ function App() {
       <Router>
         <Switch>
           <Route exact path="/">
-            <Recipes recipes={data} />
+            <Recipes recipes={recipes} />
           </Route>
           <Route path="/:recipeId">
             <RecipeDetail />
@@ -1385,58 +1370,7 @@ export default App;
 
 ## Detail Custom Hook
 
-We can use our hook in `RecipeDetail.js`.
-
-<!-- - reconfigure the useFetch hook:
-
-```js
-import React from "react";
-
-export function useFetch(url, method, body = "") {
-  const [data, setData] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
-
-  React.useEffect(() => {
-    setLoading(true);
-    fetch(url, {
-      method,
-      ...(body ? { body } : {}),
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-        setError(null);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.warn(error.message);
-        setError("error loading data");
-        setLoading(false);
-      });
-  }, [url, body, method]);
-
-  return {
-    loading,
-    data,
-    error,
-  };
-}
-```
-
-Note: we need to pass a method now.
-
-In App.js:
-
-```js
-const { loading, data, error } = useFetch(`/api/recipes`, "get");
-``` -->
-
-In `RecipeDetail.js`:
+We can also use our hook in `RecipeDetail.js`.
 
 - import the hook:
 
@@ -1482,14 +1416,13 @@ const { recipeId } = useParams();
 const { loading, data: recipe, error } = useFetch(`/api/recipes/${recipeId}`);
 ```
 
-Add the loading and error returns as above
+Add the loading and error returns as in App.js
 
 RecipeDetail in its entirety:
 
 ```js
 import React from "react";
 import { useParams, Link } from "react-router-dom";
-
 import { useFetch } from "../hooks/useFetch";
 
 function RecipeDetail() {
@@ -1501,11 +1434,7 @@ function RecipeDetail() {
   }
 
   if (error) {
-    return (
-      <React.Fragment>
-        <p>{error}</p>
-      </React.Fragment>
-    );
+    return <p>{error}</p>;
   }
 
   return (
@@ -1585,8 +1514,6 @@ return (
 
 Create some css to support the new element:
 
-css:
-
 ```css
 nav {
   min-height: 3rem;
@@ -1610,7 +1537,7 @@ nav a {
 
 ## Adding a Recipe
 
-`FormCreateRecipe.js:`
+Create `FormCreateRecipe.js`:
 
 ```js
 import React from "react";
@@ -1632,77 +1559,36 @@ const FormCreateRecipe = () => {
 export default FormCreateRecipe;
 ```
 
-Import the component into RecipeDetail.js:
+Allow it to render only if the user is logged in.
 
-`import FormCreateRecipe from './FormCreateRecipe';`
-
-<!-- And add it to the routing scheme.
+- pass the loggin state from App.js to the Recipes component:
 
 ```js
-return (
-  <div>
-    <h1>Recipes!</h1>
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <Recipes recipes={recipes} />
-        </Route>
-        <Route path="/:recipeId">
-          <RecipeDetail />
-        </Route>
-        <Route path="/maintenance">
-          <RecipeMaintenance />
-        </Route>
-      </Switch>
-    </Router>
-  </div>
-);
+<Recipes recipes={recipes} loggedin={loggedin} />
 ```
 
-Test the path in the browser. You'll get a recipe detail default. Why?
-
-`switch` is greedy. It takes the first valid route it finds. That's why we use `exact` on the main route.
-
-in `App.js`:
+Import the component into Recipes.js and use a ternary:
 
 ```js
-return (
-  <div>
-    <h1>Recipes!</h1>
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <Recipes recipes={recipes} />
-        </Route>
-        <Route path="/recipe/:recipeId">
-          <RecipeDetail />
-        </Route>
-        <Route path="/secret/maintenance">
-          <RecipeMaintenance />
-        </Route>
-      </Switch>
-    </Router>
-  </div>
-);
+import React from "react";
+import Recipe from "./Recipe";
+import FormCreateRecipe from "./FormCreateRecipe";
+
+function Recipes({ recipes, loggedin }) {
+  return (
+    <div>
+      {loggedin ? <FormCreateRecipe /> : ""}
+      {recipes.map((recipe) => (
+        <Recipe key={recipe._id} recipe={recipe} />
+      ))}
+    </div>
+  );
+}
+
+export default Recipes;
 ```
 
-In `Recipe.js`:
-
-```js
-return (
-  <>
-    <img src={`/img/${image}`} alt={name} />
-    <h3>
-      <Link to={`/recipe/${_id}`}>{title}</Link>
-    </h3>
-    <p>{description}</p>
-  </>
-);
-```
-
-Back to the maintenance form. -->
-
-Add handleInputchange and createRecipe functions:
+Add values state, handleInputchange and createRecipe functions to the form:
 
 ```js
 import React from "react";
@@ -1759,106 +1645,96 @@ const FormCreateRecipe = () => {
 export default FormCreateRecipe;
 ```
 
-https://ui.dev/computed-property-names/
+Note the difference between what we are doing here for handling state change for inputs vs. how we accomplished the same task in the [previous class](https://github.com/front-end-intermediate/React-Intro#react-forms-1) (where we were working with pirates).
+
+We are using [computed property names](https://ui.dev/computed-property-names/).
+
+Review Object assignment and computed values:
+
+```js
+var testObj = {};
+
+// dot assignment
+testObj.age = 80;
+console.log(testObj);
+
+var myKey = "name";
+var myValue = "Daniel";
+testObj = {};
+
+// bracket assignment
+testObj[myKey] = myValue;
+console.log(testObj);
+
+// Computed Property Names
+// Before: create the object first, then use bracket notation to assign that property to the value
+function objectify(key, value) {
+  let obj = {};
+  obj[key] = value;
+  return obj;
+}
+
+objectify("name", "Daniel"); //?
+
+// After: use object literal notation to assign the expression as a property on the object without having to create it first
+function objectifyTwo(key, value) {
+  return {
+    [key]: value,
+  };
+}
+
+objectifyTwo("name", "Dennis"); //?
+```
 
 Test the button.
 
-## Recipe Maintenance Function
+## addRecipe Function
 
-Add a call to a function `addRecipe.js` we will create.
-
-`RecipeMaintenance.js`:
+Add the addRecipe function to App.js and props drill it down to `Recipes`:
 
 ```js
-import React, { Component } from "react";
-
-class RecipeMaintenance extends Component {
-  nameRef = React.createRef();
-  imageRef = React.createRef();
-  descriptionRef = React.createRef();
-
-  createRecipe(e) {
-    e.preventDefault();
-    const recipe = {
-      title: this.nameRef.current.value,
-      image: this.imageRef.current.value,
-      description: this.descriptionRef.current.value,
-    };
-    this.props.addRecipe(recipe);
-  }
-
-  render() {
-    return (
-      <div>
-        <h3>Add Recipe Form</h3>
-        <form onSubmit={(e) => this.createRecipe(e)}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Recipe name"
-            defaultValue="recipe name"
-            ref={this.nameRef}
-          />
-          <input
-            type="text"
-            name="image"
-            placeholder="Recipe image"
-            defaultValue="toast.png"
-            ref={this.imageRef}
-          />
-          <textarea
-            type="text"
-            name="description"
-            placeholder="Recipe description"
-            defaultValue="recipe description"
-            ref={this.descriptionRef}
-          />
-          <button type="submit">Add Recipe</button>
-        </form>
-      </div>
-    );
-  }
-}
-
-export default RecipeMaintenance;
-```
-
-Note: there is no need for an `onChange` handler when using refs:
-
-```js
-handleChange(e) {
-  console.log("  ", e);
-}
-```
-
-Add the addRecipe function to App.js and props drill it down to `RecipeMaintenance`:
-
-```js
-const { loading, data, error, setData } = useFetch(`/api/recipes`);
+  const { loading, data: recipes, error, setData } = useFetch(`/api/recipes`);
 ...
-  const addRecipe = (recipe) => {
-    console.log(" from App ::: ", recipe);
-    setData([
-      ...data,
-      {
-        title: recipe.title,
-        image: recipe.image,
-        description: recipe.description,
-      },
-    ]);
-  };
+const addRecipe = (recipe) => {
+  console.log("bar:", recipe);
+  fetch(`/api/recipes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(recipe),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(" FOO:: ", data);
+      setData(recipe);
+    })
+    .catch((error) => console.log(error));
+};
+...
+<Route exact path="/">
+  <Recipes
+    recipes={recipes}
+    loggedin={loggedin}
+    addRecipe={addRecipe}
+  />
+</Route>
 
 ```
 
-You should see the new recipe in App in the Components dev tool.
+Note the additions to the arguments we are passing to the useFetch custom hook.
+
+We will need to make a few changes to the hook in order to accomodate them:
 
 ```js
 import React from "react";
 
-export function useFetch(url, method, body = "") {
+export function useFetch(url, method = "GET", body) {
   const [data, setData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+
+  console.log(" DATA1 ::: ", data);
 
   React.useEffect(() => {
     setLoading(true);
@@ -1883,41 +1759,307 @@ export function useFetch(url, method, body = "") {
       });
   }, [url, body, method]);
 
+  console.log(" DATA2 ::: ", data);
+
   return {
     loading,
     data,
     error,
+    setData,
   };
 }
 ```
 
-Expand the function to use our api. Note the fetch options:
+Props drill the addRecipe function to the form:
 
 ```js
-const addRecipe = (recipe) => {
-  fetch(`/api/recipes`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(recipe),
-  })
-    .then((res) => res.json())
-    .then((recipe) =>
-      setRecipes([
-        ...recipes,
-        {
-          name: recipe.name,
-          image: recipe.image,
-          description: recipe.description,
-        },
-      ])
-    )
-    .catch((error) => console.log(error));
-};
+import React from "react";
+import Recipe from "./Recipe";
+import FormCreateRecipe from "./FormCreateRecipe";
+
+function Recipes({ recipes, loggedin, addRecipe }) {
+  return (
+    <div>
+      {loggedin ? <FormCreateRecipe addRecipe={addRecipe} /> : ""}
+      {recipes.map((recipe) => (
+        <Recipe key={recipe._id} recipe={recipe} />
+      ))}
+    </div>
+  );
+}
+
+export default Recipes;
 ```
 
-Test the form.
+Destructure addRecipe and call it with a recipe:
+
+```js
+const FormCreateRecipe = ({ addRecipe }) => {
+  const [values, setValues] = React.useState({
+    title: "Recipe Title",
+    image: "toast.png",
+    description: "Description of the recipe",
+  });
+
+  const createRecipe = (event) => {
+    event.preventDefault();
+    const recipe = {
+      title: values.title,
+      image: values.image,
+      description: values.description,
+    };
+    addRecipe(recipe);
+  };
+```
+
+Test the form. The database is updated but the UI needs a refresh.
+
+## Custom Hook
+
+```js
+const GET = "GET";
+const POST = "POST";
+const PUT = "PUT";
+const PATCH = "PATCH";
+const DEL = "DELETE";
+
+const defaultHeaders = {
+  "Content-Type": "application/json",
+  Accept: "application/json",
+};
+
+async function fetchData({
+  path,
+  method,
+  data,
+  headers,
+  onUnauthorized,
+  onError,
+}) {
+  const response = await fetch(path, {
+    method: method,
+    body: !!data ? JSON.stringify(data) : null,
+    headers: !!headers ? headers : defaultHeaders,
+  }).then((response) => {
+    if (response.status === 204) {
+      return {};
+    } else if (response.status === 401 && !!onUnauthorized) {
+      return onUnauthorized(response);
+    } else if (response.status >= 500 && !!onError) {
+      return onError(response);
+    } else {
+      return response.json();
+    }
+  });
+  console.log(" path ", response);
+  return response;
+}
+
+export function useApi(onUnauthorized, onError) {
+  return {
+    get: (path, headers) =>
+      fetchData({
+        path: path,
+        method: GET,
+        data: null,
+        headers: headers,
+        onUnauthorized: onUnauthorized,
+        onError: onError,
+      }),
+    post: (path, data, headers) =>
+      fetchData({
+        path: path,
+        method: POST,
+        data: data,
+        headers: headers,
+        onUnauthorized: onUnauthorized,
+        onError: onError,
+      }),
+    put: (path, data, headers) =>
+      fetchData({
+        path: path,
+        method: PUT,
+        data: data,
+        headers: headers,
+        onUnauthorized: onUnauthorized,
+        onError: onError,
+      }),
+    patch: (path, data, headers) =>
+      fetchData({
+        path: path,
+        method: PATCH,
+        data: data,
+        headers: headers,
+        onUnauthorized: onUnauthorized,
+        onError: onError,
+      }),
+    del: (path, headers) =>
+      fetchData({
+        path: path,
+        method: DEL,
+        data: null,
+        headers: headers,
+        onUnauthorized: onUnauthorized,
+        onError: onError,
+      }),
+  };
+}
+
+export default useApi;
+```
+
+In App.js:
+
+```js
+import { useApi } from "../hooks/useFetch";
+...
+function App() {
+  const { get, post } = useApi();
+  const [recipes, setRecipes] = React.useState([]);
+  const [recipe, setRecipe] = React.useState();
+  ...
+  React.useEffect(() => {
+    get("/api/recipes").then((data) => {
+      setRecipes(data);
+    });
+  }, [recipe]);
+
+  const addRecipe = (recipe) => {
+    console.log("bar:", recipe);
+    post("/api/recipes", recipe).then((data) => {
+      setRecipe(data);
+    });
+```
+
+Here's the entire App.js file:
+
+```js
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Recipes from "./Recipes";
+import RecipeDetail from "./RecipeDetail";
+import Nav from "./Nav";
+import { useApi } from "../hooks/useFetch";
+
+function App() {
+  const { get, post } = useApi();
+  const [recipes, setRecipes] = React.useState([]);
+  const [recipe, setRecipe] = React.useState();
+  const [loggedin, setLoggedin] = React.useState(true);
+
+  React.useEffect(() => {
+    get("/api/recipes").then((data) => {
+      setRecipes(data);
+    });
+  }, [recipe]);
+
+  const addRecipe = (recipe) => {
+    console.log("bar:", recipe);
+    post("/api/recipes", recipe).then((data) => {
+      setRecipe(data);
+    });
+  };
+
+  return (
+    <div>
+      <Router>
+        <Nav setLoggedin={setLoggedin} loggedin={loggedin} />
+        <Switch>
+          <Route exact path="/">
+            <Recipes
+              recipes={recipes}
+              loggedin={loggedin}
+              addRecipe={addRecipe}
+            />
+          </Route>
+          <Route path="/:recipeId">
+            <RecipeDetail recipes={recipes} />
+          </Route>
+        </Switch>
+      </Router>
+    </div>
+  );
+}
+
+export default App;
+```
+
+## Configure Details View
+
+```js
+import React from "react";
+import { useParams, Link } from "react-router-dom";
+import { useApi } from "../hooks/useFetch";
+
+function RecipeDetail() {
+  const { get } = useApi();
+  const { recipeId } = useParams();
+  const [recipe, setRecipe] = React.useState({
+    title: "",
+    description: "",
+    image: "toast.png",
+    ingredients: [],
+    preparation: [],
+  });
+
+  React.useEffect(() => {
+    get(`api/recipes/${recipeId}`).then((data) => {
+      setRecipe(data);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div>
+      <img src={`/img/${recipe.image}`} alt={recipe.title} />
+      <h1>{recipe.title}</h1>
+      <p>{recipe.description}</p>
+      <h3>Ingredients</h3>
+      <ul>
+        {recipe.ingredients.map((ingredient) => (
+          <li key={ingredient}>{ingredient}</li>
+        ))}
+      </ul>
+      <h3>Preparation</h3>
+      <ul>
+        {recipe.preparation.map((prep) => (
+          <li key={prep.step}>{prep.step}</li>
+        ))}
+      </ul>
+      <Link to="/">Home</Link>
+    </div>
+  );
+}
+
+export default RecipeDetail;
+```
+
+## Delete
+
+App.js:
+
+```js
+  const deleteRecipe = (recipeId) => {
+    console.log("recipeId:", recipeId);
+    del(`/api/recipes/${recipeId}`).then(window.location.replace("/"));
+  };
+  ...
+  <RecipeDetail loggedin={loggedin} deleteRecipe={deleteRecipe} />
+```
+
+RecipeDetail.js:
+
+```js
+{
+  loggedin ? (
+    <button onClick={() => deleteRecipe(recipe._id)}>delete</button>
+  ) : (
+    ""
+  );
+}
+
+<Link to="/">Home</Link>;
+```
 
 ## Reduce
 
