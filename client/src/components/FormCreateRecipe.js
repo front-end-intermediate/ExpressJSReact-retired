@@ -5,6 +5,7 @@ const FormCreateRecipe = ({ addRecipe }) => {
     title: "Recipe Title",
     image: "toast.png",
     description: "Description of the recipe",
+    ingredients: ["ham", "cheese"],
   });
 
   const createRecipe = (event) => {
@@ -13,6 +14,7 @@ const FormCreateRecipe = ({ addRecipe }) => {
       title: values.title,
       image: values.image,
       description: values.description,
+      ingredients: values.ingredients,
     };
     addRecipe(recipe);
   };
@@ -25,7 +27,7 @@ const FormCreateRecipe = ({ addRecipe }) => {
 
   return (
     <div>
-      <h3>Add Recipe Form</h3>
+      <h2>Add Recipe Form</h2>
       <form onSubmit={createRecipe}>
         <input
           type="text"
@@ -47,7 +49,23 @@ const FormCreateRecipe = ({ addRecipe }) => {
           onChange={handleInputChange}
           value={values.description}
         />
-
+        <h3>Ingredients</h3>
+        <input
+          type="text"
+          placeholder="Recipe ingredient"
+          value={values.ingredients[0]}
+          name="ingredient"
+          onChange={handleInputChange}
+        />
+        <input
+          type="text"
+          placeholder="Recipe ingredient"
+          value={values.ingredients[1]}
+          name="ingredient"
+          onChange={handleInputChange}
+        />
+        <button>+</button>
+        <hr />
         <button type="submit">Add Recipe</button>
       </form>
     </div>
