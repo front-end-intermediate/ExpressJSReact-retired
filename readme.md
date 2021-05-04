@@ -1287,9 +1287,7 @@ function App() {
 ReactDOM.render(<App />, document.querySelector("#root"));
 ```
 
-<!-- HERE2021 -->
-
-Reset `index.js` to use our old App file. We will retrofit our hook for use in out recipes app.
+Reset `index.js` to use our old App file. We will retrofit our hook for use in our recipes app.
 
 - import the hook into App.js:
 
@@ -2034,6 +2032,8 @@ function RecipeDetail() {
 export default RecipeDetail;
 ```
 
+<!-- 2021HERE -->
+
 ## Delete
 
 App.js:
@@ -2060,6 +2060,334 @@ RecipeDetail.js:
 
 <Link to="/">Home</Link>;
 ```
+
+## Ingredients
+
+FormCreateRecipe.js:
+
+```js
+const [values, setValues] = React.useState({
+  title: "Recipe Title",
+  image: "toast.png",
+  description: "Description of the recipe",
+  ingredients: ["ham", "cheese"],
+});
+...
+<h3>Ingredients</h3>
+<input
+  type="text"
+  placeholder="Recipe ingredient"
+  value={values.ingredients[0]}
+  name="ingredient"
+  onChange={handleInputChange}
+/>
+<input
+  type="text"
+  placeholder="Recipe ingredient"
+  value={values.ingredients[1]}
+  name="ingredient"
+  onChange={handleInputChange}
+/>
+```
+
+```js
+const createRecipe = (event) => {
+  event.preventDefault();
+  const recipe = {
+    title: values.title,
+    image: values.image,
+    description: values.description,
+    ingredients: values.ingredients,
+  };
+  console.log("  ", recipe);
+  // addRecipe(recipe);
+};
+```
+
+## Mapping Ingredients
+
+```js
+{
+  values.ingredients.map((ingredient, index) => (
+    <input
+      key={index}
+      type="text"
+      placeholder="Recipe ingredient"
+      value={ingredient}
+      name={`ingredient-${index}`}
+      onChange={handleInputChange}
+    />
+  ));
+}
+```
+
+## Adding Ingredients
+
+FormCreateRecipe.js:
+
+```js
+import React from "react";
+
+const FormCreateRecipe = ({ addRecipe }) => {
+  const [values, setValues] = React.useState({
+    title: "Recipe Title",
+    image: "toast.png",
+    description: "Description of the recipe",
+    ingredients: { ingredient0: "eggs", ingredient1: "ham" },
+  });
+
+  const createRecipe = (event) => {
+    event.preventDefault();
+    const recipe = {
+      title: values.title,
+      image: values.image,
+      description: values.description,
+      ingredients: values.ingredients,
+    };
+    console.log("  ", recipe);
+    addRecipe(recipe);
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    console.log(" value ", value);
+    console.log(" name ", name);
+    setValues({ ...values, [name]: value });
+  };
+
+  const handleIngredientsInputChange = (event) => {
+    const { name, value } = event.target;
+    const list = values.ingredients;
+    list[name] = value;
+    console.log("list:::", list[name]);
+    console.log("value:::", e.target.value);
+    console.log("name:::", e.target.name);
+    setValues({ ...values, [name]: value });
+  };
+
+  const handleRemoveClick = (event, index) => {
+    event.preventDefault();
+    const list = values.ingredients;
+    const itemToDelete = `ingredient${index}`;
+    delete list[itemToDelete];
+    setValues({ ...values, list });
+  };
+
+  const handleAddClick = (event) => {
+    const list = values.ingredients;
+    const howManyIngredients = Object.keys(list).length;
+    const newKey = `ingredient${howManyIngredients}`;
+    list[newKey] = "new ingredient";
+    // const itemToAdd = { ingredient: 'new ingredient' }
+    list.push(itemToAdd);
+    setValues({ ...values, list });
+  };
+
+  return (
+    <div>
+      <h2>Add Recipe Form</h2>
+      <form onSubmit={createRecipe}>
+        <input
+          type="text"
+          placeholder="Recipe title"
+          value={values.title}
+          name="title"
+          onChange={handleInputChange}
+        />
+        <input
+          type="text"
+          placeholder="Recipe image"
+          value={values.image}
+          name="image"
+          onChange={handleInputChange}
+        />
+        <textarea
+          placeholder="Recipe description"
+          name="description"
+          onChange={handleInputChange}
+          value={values.description}
+        />
+        <h3>Ingredients</h3>
+        {Object.values(values.ingredients).map((ingredient, index) => (
+          <div key={index}>
+            <input
+              type="text"
+              placeholder="Recipe ingredient"
+              value={ingredient}
+              name={`ingredient${index}`}
+              onChange={handleIngredientsInputChange}
+            />
+            {Object.keys(values.ingredients).length !== 1 && (
+              <button onClick={(event) => handleRemoveClick(event, index)}>
+                Remove
+              </button>
+            )}
+            {Object.keys(values.ingredients).length - 1 === index && (
+              <button onClick={(event) => handleAddClick(event)}>Add</button>
+            )}
+          </div>
+        ))}
+        <hr />
+        <button type="submit">Add Recipe</button>
+      </form>
+    </div>
+  );
+};
+
+export default FormCreateRecipe;
+```
+
+Use an array of objects instead:
+
+```js
+import React from "react";
+
+const FormCreateRecipe = ({ addRecipe }) => {
+  const [values, setValues] = React.useState({
+    title: "Recipe Title",
+    image: "toast.png",
+    description: "Description of the recipe",
+    // ingredients: { ingredient0: 'eggs', ingredient1: 'ham' },
+    ingredients: [{ ingredient: "eggs" }, { ingredient: "ham" }],
+  });
+
+  const createRecipe = (event) => {
+    event.preventDefault();
+    const recipe = {
+      title: values.title,
+      image: values.image,
+      description: values.description,
+      ingredients: values.ingredients,
+    };
+    console.log("  ", recipe);
+    addRecipe(recipe);
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    console.log(" value ", value);
+    console.log(" name ", name);
+    setValues({ ...values, [name]: value });
+  };
+
+  const handleIngredientsInputChange = (event) => {
+    const { name, value } = event.target;
+    const list = values.ingredients;
+    list[name] = value;
+    // console.log("list:::", list[name]);
+    // console.log("value:::", e.target.value);
+    // console.log("name:::", e.target.name);
+    setValues({ ...values, [name]: value });
+  };
+
+  const handleRemoveClick = (event, index) => {
+    event.preventDefault();
+    const list = values.ingredients;
+    const itemToDelete = `ingredient${index}`;
+    // delete list[itemToDelete]
+    list.splice(index, 1);
+    setValues({ ...values, list });
+  };
+
+  const handleAddClick = (event) => {
+    const list = values.ingredients;
+    // const howManyIngredients = Object.keys(list).length
+    // const newKey = `ingredient${howManyIngredients}`
+    // list[newKey] = 'new ingredient'
+    const itemToAdd = { ingredient: "new ingredient" };
+    list.push(itemToAdd);
+    setValues({ ...values, list });
+  };
+
+  return (
+    <div>
+      <h2>Add Recipe Form</h2>
+      <form onSubmit={createRecipe}>
+        <input
+          type="text"
+          placeholder="Recipe title"
+          value={values.title}
+          name="title"
+          onChange={handleInputChange}
+        />
+        <input
+          type="text"
+          placeholder="Recipe image"
+          value={values.image}
+          name="image"
+          onChange={handleInputChange}
+        />
+        <textarea
+          placeholder="Recipe description"
+          name="description"
+          onChange={handleInputChange}
+          value={values.description}
+        />
+        <h3>Ingredients</h3>
+        {/* {Object.values(values.ingredients).map((ingredient, index) => ( */}
+        {Object.values(values.ingredients).map((ingred, index) => (
+          <div key={index}>
+            <input
+              type="text"
+              placeholder="Recipe ingredient"
+              // value={ingredient}
+              value={ingred.ingredient}
+              name={`ingredient${index}`}
+              onChange={handleIngredientsInputChange}
+            />
+            {Object.keys(values.ingredients).length !== 1 && (
+              <button onClick={(event) => handleRemoveClick(event, index)}>
+                Remove
+              </button>
+            )}
+            {Object.keys(values.ingredients).length - 1 === index && (
+              <button onClick={(event) => handleAddClick(event)}>Add</button>
+            )}
+          </div>
+        ))}
+        <hr />
+        <button type="submit">Add Recipe</button>
+      </form>
+    </div>
+  );
+};
+
+export default FormCreateRecipe;
+```
+
+Accomodate the new data structure in the detail view:
+
+```js
+<ul>
+  {recipe.ingredients.map((ingred) => (
+    <li key={ingred.ingredient}>{ingred.ingredient}</li>
+  ))}
+</ul>
+```
+
+Retrofit our import api endpoint to create recipes as an array of objects:
+
+```js
+exports.import = function (req, res) {
+    Recipe.create(
+        {
+            title: 'Lasagna',
+            description:
+                'Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.',
+            image: 'lasagna.png',
+            ingredients: [{ ingredient: 'eggs' }, { ingredient: 'ham' }],
+            preparation: [
+                { step: 'Boil water' },
+                { step: 'Fry the eggs' },
+                { step: 'Serve hot' },
+            ],
+        },
+    ...
+```
+
+## Update a Recipe
+
+<!-- [tc] -->
 
 ## Reduce
 
@@ -2605,12 +2933,6 @@ export default RecipeMaintenance;
 
 <!-- HERE -->
 
-https://dev.to/ksushiva/authentication-with-react-js-9e4
-
-https://dev.to/techcheck/react-hooks-usereducer-pnj
-
-https://dev.to/mbellagamba/data-fetching-react-hook-4dfc
-
 Adding delete to RecipeMaintenance:
 
 ```js
@@ -2687,7 +3009,10 @@ function ListRecipes(props) {
           {recipe.title}
           <button
             onClick={() => props.deleteRecipe(recipe)}
-            style={{ backgroundColor: "transparent", border: "none" }}
+            style={{
+              backgroundColor: "transparent",
+              border: "none",
+            }}
           >
             <FaTimesCircle color="rgb(194, 57, 42)" size={20} />
           </button>
@@ -2788,7 +3113,10 @@ class ListRecipes extends Component {
           <li key={recipe._id}>
             <Link to={`/editrecipe/${recipe._id}`}>{recipe.title}</Link>{" "}
             <button
-              style={{ backgroundColor: "transparent", border: "none" }}
+              style={{
+                backgroundColor: "transparent",
+                border: "none",
+              }}
               onClick={() => this.props.handleDelete(recipe._id)}
             >
               <FaTimesCircle color="rgb(194, 57, 42)" size={20} />
