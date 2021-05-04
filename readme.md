@@ -1287,9 +1287,7 @@ function App() {
 ReactDOM.render(<App />, document.querySelector("#root"));
 ```
 
-<!-- HERE2021 -->
-
-Reset `index.js` to use our old App file. We will retrofit our hook for use in out recipes app.
+Reset `index.js` to use our old App file. We will retrofit our hook for use in our recipes app.
 
 - import the hook into App.js:
 
@@ -2034,6 +2032,8 @@ function RecipeDetail() {
 export default RecipeDetail;
 ```
 
+<!-- 2021HERE -->
+
 ## Delete
 
 App.js:
@@ -2060,6 +2060,235 @@ RecipeDetail.js:
 
 <Link to="/">Home</Link>;
 ```
+
+## Editing a Recipe
+
+EditRecipe.js:
+
+```js
+import React from "react";
+
+class EditRecipe extends React.Component {
+  state = {
+    recipe: [],
+    isLoading: false,
+  };
+
+  componentDidMount() {
+    this.setState({ isLoading: true });
+    fetch(`http://localhost:5000/api/recipes/${this.props.recipeid}`)
+      .then((response) => response.json())
+      .then((recipe) =>
+        this.setState({
+          recipe: recipe,
+          isLoading: false,
+        })
+      );
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>EDIT RECIPE</h3>
+        {this.state.recipe.title}
+      </div>
+    );
+  }
+}
+
+export default EditRecipe;
+```
+
+Add a link in maintenance:
+
+```js
+class ListRecipes extends Component {
+  render() {
+    return (
+      <ul>
+        {this.props.recipes.map((recipe) => (
+          <li key={recipe._id}>
+            <Link to={`/editrecipe/${recipe._id}`}>{recipe.title}</Link>{" "}
+            <button
+              style={{ backgroundColor: "transparent", border: "none" }}
+              onClick={() => this.props.handleDelete(recipe._id)}
+            >
+              <FaTimesCircle color="rgb(194, 57, 42)" size={20} />
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+}
+```
+
+Expand edit form:
+
+```js
+import React from "react";
+
+class EditRecipe extends React.Component {
+  state = {
+    recipe: [],
+    isLoading: false,
+  };
+
+  componentDidMount() {
+    this.setState({ isLoading: true });
+    fetch(`http://localhost:5000/api/recipes/${this.props.recipeId}`)
+      .then((response) => response.json())
+      .then((recipe) =>
+        this.setState({
+          recipe: recipe,
+          isLoading: false,
+        })
+      );
+  }
+
+  handleSubmit() {
+    return false;
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>EDIT RECIPE</h3>
+        <form onSubmit={this.handleSubmit}>
+          <input
+            type="text"
+            placeholder="Recipe Title"
+            name="title"
+            value={this.state.recipe.title}
+          />
+          <input
+            type="text"
+            placeholder="Image"
+            name="image"
+            value={this.state.recipe.image}
+          />
+          <textarea
+            type="text"
+            placeholder="Description"
+            name="description"
+            value={this.state.recipe.description}
+          />
+          <button>Update</button>
+        </form>
+      </div>
+    );
+  }
+}
+
+export default EditRecipe;
+```
+
+## Ingredients
+
+Form:
+
+```js
+const [values, setValues] = React.useState({
+  title: "Recipe Title",
+  image: "toast.png",
+  description: "Description of the recipe",
+  ingredients: ["ham", "cheese"],
+});
+...
+<h3>Ingredients</h3>
+<input
+  type="text"
+  placeholder="Recipe ingredient"
+  value={values.ingredients[0]}
+  name="ingredient"
+  onChange={handleInputChange}
+/>
+<input
+  type="text"
+  placeholder="Recipe ingredient"
+  value={values.ingredients[1]}
+  name="ingredient"
+  onChange={handleInputChange}
+/>
+```
+
+```js
+const createRecipe = (event) => {
+  event.preventDefault();
+  const recipe = {
+    title: values.title,
+    image: values.image,
+    description: values.description,
+    ingredients: values.ingredients,
+  };
+  console.log("  ", recipe);
+  // addRecipe(recipe);
+};
+```
+
+## Mapping Ingredients
+
+```js
+{
+  ingredients.map((ingredient, index) => (
+    <input
+      key={index}
+      type="text"
+      placeholder="Recipe ingredient"
+      value={ingredient}
+      name={`ingredient-${index}`}
+      onChange={handleInputChange}
+    />
+  ));
+}
+```
+
+```js
+  const appendInput = () => {
+    const newInput = `ingredient-${temp.length}`;
+    console.log("  ", newInput);
+    setTemp([...temp, newInput]);
+    // setTemp({ ...temp, ingredient: newInput });
+  };
+  ...
+<button onClick={appendInput}>+</button>
+<hr />
+```
+
+## react-icons
+
+npm install react-icons and use them in the maintenance interface:
+
+```js
+import React, { Component } from "react";
+import { FaTimesCircle } from "react-icons/fa";
+
+class ListRecipes extends Component {
+  render() {
+    return (
+      <ul>
+        {this.props.recipes.map((recipe) => (
+          <li key={recipe._id}>
+            {recipe.title}{" "}
+            <button
+              style={{ backgroundColor: "transparent" }}
+              onClick={() => this.props.handleDelete(recipe._id)}
+            >
+              <FaTimesCircle color="rgb(194, 57, 42)" size={20} />
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+}
+```
+
+Note the use of inline css.
+
+Try removing the border:
+
+`style={{ backgroundColor: 'transparent', border: 'none' }}`
 
 ## Reduce
 
